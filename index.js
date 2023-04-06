@@ -1,11 +1,15 @@
 const express = require("express");
 const cors = require("cors");
+const middleware = require("./auth-middleware");
 
 const app = express();
 const port = 3000;
 app.use(cors());
+app.use(middleware.decodeToken);
 
 app.get("/api/todo", (req, res) => {
+  console.log(req.headers);
+
   res.json({
     todos: [
       {
