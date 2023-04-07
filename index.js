@@ -2,9 +2,21 @@ const express = require("express");
 const cors = require("cors");
 const middleware = require("./auth-middleware");
 const admin = require("./src/config/firebase-config");
+const helmet = require("helmet");
 
 const app = express();
 const port = 3000;
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      fontSrc: ["'self'", "data:"],
+      imgSrc: ["'self'", "data:"],
+      styleSrc: ["'self'", "https:", "unsafe-inline"],
+      scriptSrc: ["'self'", "https:", "unsafe-inline"],
+    },
+  })
+);
 app.use(cors());
 app.use(middleware.decodeToken);
 
