@@ -29,5 +29,5 @@ app.get("/api/todo", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Expense-core listening at http://localhost:${port}`);
 });
