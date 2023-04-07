@@ -11,13 +11,16 @@ const getFirebaseSecret = async () => {
 };
 
 const initializeFirebaseApp = async () => {
-  const serviceAccount = await getFirebaseSecret();
-
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+  if (admin.apps.length === 0) {
+    const serviceAccount = await getFirebaseSecret();
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+  }
 };
 
-initializeFirebaseApp();
-
-module.exports = admin;
+module.exports = {
+  admin,
+  auth: admin.auth,
+  initializeFirebaseApp,
+};

@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const middleware = require("./auth-middleware");
+const admin = require("./src/config/firebase-config");
 
 const app = express();
 const port = 3000;
@@ -8,8 +9,6 @@ app.use(cors());
 app.use(middleware.decodeToken);
 
 app.get("/api/todo", (req, res) => {
-  console.log(req.headers);
-
   res.json({
     todos: [
       {
@@ -28,6 +27,11 @@ app.get("/api/todo", (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Expense-core listening at http://localhost:${port}`);
-});
+const startServer = async () => {
+  await admin.initializeFirebaseApp();
+  app.listen(port, () => {
+    console.log(`Expense-core listening at http://localhost:${port}`);
+  });
+};
+
+startServer();
