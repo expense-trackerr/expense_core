@@ -1,6 +1,12 @@
-const { auth } = require("./src/config/firebase-config");
+import { auth } from "./src/config/firebase-config";
+import { Response, NextFunction } from "express";
+import { UserAuthInfoRequest } from "./express-types";
 
-async function decodeToken(req, res, next) {
+export async function decodeToken(
+  req: UserAuthInfoRequest,
+  res: Response,
+  next: NextFunction
+) {
   if (!req.headers.authorization) {
     return res.status(401).send("Authorization header is missing.");
   }
@@ -14,8 +20,6 @@ async function decodeToken(req, res, next) {
     }
     return res.status(401).json({ message: "Unauthorized" });
   } catch (error) {
-    return res.json({ message: error.message });
+    return res.json({ message: (error as Error).message });
   }
 }
-
-module.exports = decodeToken;

@@ -1,9 +1,10 @@
-const express = require("express");
-const cors = require("cors");
-const decodeToken = require("./auth-middleware");
-const admin = require("./src/config/firebase-config");
-const helmet = require("helmet");
-const db = require("./database");
+import express from "express";
+import cors from "cors";
+import { decodeToken } from "./auth-middleware";
+import { initializeFirebaseApp } from "./src/config/firebase-config";
+import helmet from "helmet";
+import db from "./database";
+import { UserAuthInfoRequest } from "./express-types";
 
 const app = express();
 const port = 3000;
@@ -31,8 +32,8 @@ app.get("/api/todo", (req, res) => {
   });
 });
 
-app.post("/api/categories", async (req, res) => {
-  const { categories } = req.body;
+app.post("/api/categories", async (req: UserAuthInfoRequest, res) => {
+  const { categories }: { categories: string[] } = req.body;
   console.log("categories:", categories);
   const userUid = req.userUid;
   try {
@@ -45,12 +46,12 @@ app.post("/api/categories", async (req, res) => {
     await Promise.all(insertPromises);
     res.status(201).json({ message: "Category created successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: (error as Error).message });
   }
 });
 
 const startServer = async () => {
-  await admin.initializeFirebaseApp();
+  await initializeFirebaseApp();
   app.listen(port, () => {
     console.log(`Expense-core listening at http://localhost:${port}`);
   });
