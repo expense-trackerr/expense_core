@@ -9,6 +9,7 @@ const app = express();
 const port = 3000;
 app.use(helmet());
 app.use(cors());
+app.use(express.json());
 app.use(decodeToken);
 
 app.get("/api/todo", (req, res) => {
@@ -28,6 +29,24 @@ app.get("/api/todo", (req, res) => {
       },
     ],
   });
+});
+
+app.post("/api/categories", async (req, res) => {
+  const { categories } = req.body;
+  console.log("categories:", categories);
+  const userUid = req.userUid;
+  try {
+    const insertPromises = categories.map((category) => {
+      return db.query("INSERT INTO categories (name, user_uid) VALUES (?, ?)", [
+        category,
+        userUid,
+      ]);
+    });
+    await Promise.all(insertPromises);
+    res.status(201).json({ message: "Category created successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 const startServer = async () => {

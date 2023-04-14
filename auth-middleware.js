@@ -9,6 +9,7 @@ async function decodeToken(req, res, next) {
     const decodeValue = await auth().verifyIdToken(token);
     if (decodeValue) {
       req.user = decodeValue;
+      req.userUid = decodeValue.uid;
       return next();
     }
     return res.status(401).json({ message: "Unauthorized" });
