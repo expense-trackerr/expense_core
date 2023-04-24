@@ -32,6 +32,8 @@ app.get("/api/todo", (req, res) => {
   });
 });
 
+//DB
+// Creates entries in the categories table
 app.post("/api/categories", async (req: UserAuthInfoRequest, res) => {
   const { categories }: { categories: string[] } = req.body;
   console.log("categories:", categories);
@@ -45,6 +47,32 @@ app.post("/api/categories", async (req: UserAuthInfoRequest, res) => {
     });
     await Promise.all(insertPromises);
     res.status(201).json({ message: "Category created successfully" });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+});
+
+// DB
+// Deletes entries in the categories table
+app.post("/api/categories-delete", async (req: UserAuthInfoRequest, res) => {
+  const { categories }: { categories: string | string[] } = req.body;
+  const userUid = req.userUid;
+  try {
+    if (typeof categories === "string") {
+      await db.query("DELETE FROM categories WHERE name = ? AND user_uid = ?", [
+        categories,
+        userUid,
+      ]);
+    } else {
+      const deletePromises = categories.map((category) => {
+        return db.query(
+          "DELETE FROM categories WHERE name = ? AND user_uid = ?",
+          [category, userUid]
+        );
+      });
+      await Promise.all(deletePromises);
+    }
+    res.status(201).json({ message: "Category deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
