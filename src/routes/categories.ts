@@ -4,6 +4,8 @@ import db from "../../database";
 
 const router = express.Router();
 
+//DB
+// Creates entries in the categories table
 router.post("/create", async (req: UserAuthInfoRequest, res) => {
   const { categories }: { categories: string[] } = req.body;
   console.log("categories:", categories);

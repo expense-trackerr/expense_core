@@ -17,28 +17,6 @@ app.use(decodeToken);
 app.use("/api/categories", categories);
 app.use("/api/todo", todo);
 
-// app.get("/api/todo", (req, res) => {
-//   res.json({
-//     todos: [
-//       {
-//         id: 1,
-//         title: "Todo One",
-//       },
-//       {
-//         id: 2,
-//         title: "Todo Two",
-//       },
-//       {
-//         id: 3,
-//         title: "Todo Three",
-//       },
-//     ],
-//   });
-// });
-
-//DB
-// Creates entries in the categories table
-
 const startServer = async () => {
   await initializeFirebaseApp();
   app.listen(port, () => {
