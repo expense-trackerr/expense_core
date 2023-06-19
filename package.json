@@ -2,10 +2,11 @@
   "name": "expense_core",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "./src/index.ts",
   "scripts": {
-    "dev": "nodemon index.ts",
-    "start": "node index.ts"
+    "dev": "nodemon ./src/index.ts",
+    "start": "node src/index.ts",
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'"
   },
   "author": "",
   "license": "ISC",
@@ -21,6 +22,13 @@
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/node": "^18.15.11",
+    "@typescript-eslint/eslint-plugin": "^5.59.11",
+    "@typescript-eslint/parser": "^5.59.11",
+    "eslint": "^8.43.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-base-typescript": "^1.1.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"

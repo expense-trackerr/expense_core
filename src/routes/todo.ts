@@ -1,20 +1,20 @@
-import express from "express";
+import express from 'express';
 const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get('/', (req, res) => {
   res.json({
     todos: [
       {
         id: 1,
-        title: "Todo One",
+        title: 'Todo One',
       },
       {
         id: 2,
-        title: "Todo Two",
+        title: 'Todo Two',
       },
       {
         id: 3,
-        title: "Todo Three",
+        title: 'Todo Three',
       },
     ],
   });
