@@ -1,12 +1,12 @@
 import express from 'express';
-import { UserAuthInfoRequest } from '../utils/express-types';
+import { UserInfoRequest } from '../utils/express-types';
 import db from '../db/database';
 
 const router = express.Router();
 
 //DB
 // Creates entries in the categories table
-router.post('/create', async (req: UserAuthInfoRequest, res) => {
+router.post('/create', async (req: UserInfoRequest, res) => {
   const { categories }: { categories: string[] } = req.body;
   console.log('categories:', categories);
   const userUid = req.userUid;
@@ -26,7 +26,7 @@ router.post('/create', async (req: UserAuthInfoRequest, res) => {
 
 // DB
 // Deletes entries in the categories table
-router.post('/delete', async (req: UserAuthInfoRequest, res) => {
+router.post('/delete', async (req: UserInfoRequest, res) => {
   const { categories }: { categories: string | string[] } = req.body;
   const userUid = req.userUid;
   try {
