@@ -8,9 +8,39 @@ const router = express.Router();
 // Creates entries in the categories table
 router.post('/create', async (req: UserInfoRequest, res) => {
   const { categories }: { categories: string[] } = req.body;
-  console.log('categories:', categories);
   const userUid = req.userUid;
   try {
+    if (!userUid) {
+      return res.status(400).json({
+        message:
+          'User ID is not present. Ensure that you are logged in to the application',
+      });
+    }
+    // Categories cannot be empty
+    if (!categories || categories.length === 0) {
+      return res.status(400).json({ message: 'Categories cannot be empty' });
+    }
+
+    // Unique categories validation
+    const duplicateCategories = await Promise.all(
+      categories.map((category) => {
+        return db.query(
+          'SELECT name FROM categories WHERE name = ? AND user_uid = ?',
+          [category, userUid]
+        );
+      })
+    );
+
+    const duplicateCategoryNames = duplicateCategories
+      .map((result) => result[0][0]?.name)
+      .filter((name) => name !== undefined);
+
+    if (duplicateCategoryNames.length > 0) {
+      return res.status(400).json({
+        message: `${duplicateCategoryNames[0]} already exists`,
+      });
+    }
+
     const insertPromises = categories.map((category) => {
       return db.query('INSERT INTO categories (name, user_uid) VALUES (?, ?)', [
         category,
