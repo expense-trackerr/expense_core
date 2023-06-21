@@ -8,7 +8,6 @@ const router = express.Router();
 // Creates entries in the categories table
 router.post('/create', async (req: UserInfoRequest, res) => {
   const { categories }: { categories: string[] } = req.body;
-  console.log('categories:', categories);
   const userUid = req.userUid;
   try {
     if (!userUid) {
