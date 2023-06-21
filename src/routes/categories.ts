@@ -8,6 +8,7 @@ const router = express.Router();
 // Creates entries in the categories table
 router.post('/create', async (req: UserInfoRequest, res) => {
   const { categories }: { categories: string[] } = req.body;
+  console.log('categories:', categories);
   const userUid = req.userUid;
   try {
     if (!userUid) {
@@ -17,7 +18,11 @@ router.post('/create', async (req: UserInfoRequest, res) => {
       });
     }
     // Categories cannot be empty
-    if (!categories || categories.length === 0) {
+    if (
+      !categories ||
+      categories.length === 0 ||
+      categories.some((category) => !category.trim())
+    ) {
       return res.status(400).json({ message: 'Categories cannot be empty' });
     }
 
