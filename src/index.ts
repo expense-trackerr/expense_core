@@ -1,12 +1,12 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import { initializeFirebaseApp } from './config/firebase-config';
-import { decodeToken } from './middleware/auth-middleware';
-import morgan from 'morgan';
-import { schema } from './graphql/schema';
 import { ApolloServer } from 'apollo-server-express';
+import cors from 'cors';
+import express from 'express';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import { initializeFirebaseApp } from './config/firebase-config';
 import { resolvers } from './graphql/resolvers';
+import { schema } from './graphql/schema';
+import { decodeToken } from './middleware/auth-middleware';
 const categories = require('./routes/categories');
 const todo = require('./routes/todo');
 
@@ -25,9 +25,12 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'dev') {
 }
 
 const startServer = async () => {
-  const server = new ApolloServer({ typeDefs: schema, resolvers });
+  const server = new ApolloServer({
+    typeDefs: schema,
+    resolvers,
+  });
   await server.start();
-  server.applyMiddleware({ app });
+  server.applyMiddleware({ app, path: '/graphql' });
   await initializeFirebaseApp();
   app.listen(port, () => {
     console.log(`Expense-core listening at http://localhost:${port}`);

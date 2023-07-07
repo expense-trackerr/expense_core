@@ -7,6 +7,10 @@ export async function decodeToken(
   res: Response,
   next: NextFunction
 ) {
+  // Skip authentication check for GraphQL requests
+  if (req.path === '/graphql') {
+    return next();
+  }
   if (!req.headers.authorization) {
     return res.status(401).send('Authorization header is missing.');
   }
