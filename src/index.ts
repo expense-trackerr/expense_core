@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import { initializeFirebaseApp } from './config/firebase-config';
 import { resolvers } from './graphql/resolvers';
 import { schema } from './graphql/schema';
-import { decodeToken } from './middleware/auth-middleware';
+import { decodeToken, graphQlMiddleware } from './middleware/auth-middleware';
 const categories = require('./routes/categories');
 const todo = require('./routes/todo');
 
@@ -28,6 +28,7 @@ const startServer = async () => {
   const server = new ApolloServer({
     typeDefs: schema,
     resolvers,
+    context: graphQlMiddleware,
   });
   await server.start();
   server.applyMiddleware({ app, path: '/graphql' });
