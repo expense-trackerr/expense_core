@@ -6,7 +6,10 @@ import morgan from 'morgan';
 import { initializeFirebaseApp } from './config/firebase-config';
 import { resolvers } from './graphql/resolvers';
 import { schema } from './graphql/schema';
-import { decodeToken, graphQlMiddleware } from './middleware/auth-middleware';
+import {
+  restMiddleware,
+  graphQlMiddleware,
+} from './middleware/auth-middleware';
 const categories = require('./routes/categories');
 const todo = require('./routes/todo');
 
@@ -17,7 +20,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 // @ts-ignore: Will resolve it later
-app.use(decodeToken);
+app.use(restMiddleware);
 app.use('/api/categories', categories);
 app.use('/api/todo', todo);
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'dev') {

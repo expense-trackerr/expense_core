@@ -3,11 +3,11 @@ import { NextFunction, Response } from 'express';
 import { admin, auth } from '../config/firebase-config';
 import { UserAuthInfoRequest } from '../utils/express-types';
 
-export async function decodeToken(
+export const restMiddleware = async (
   req: UserAuthInfoRequest,
   res: Response,
   next: NextFunction
-) {
+) => {
   // Skip authentication check for GraphQL requests
   if (req.path === '/graphql') {
     return next();
@@ -27,7 +27,7 @@ export async function decodeToken(
   } catch (error) {
     return res.json({ message: (error as Error).message });
   }
-}
+};
 
 export const graphQlMiddleware = async ({
   req,
