@@ -17,6 +17,7 @@
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
     "@typescript-eslint/comma-dangle": "off",
-    "import/no-extraneous-dependencies": ["off"]
+    "import/no-extraneous-dependencies": ["off"],
+    "no-unused-vars": "warn"
   }
 }
