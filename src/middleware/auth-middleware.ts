@@ -1,5 +1,6 @@
-import { ApolloError } from 'apollo-server-express';
 import { NextFunction, Response } from 'express';
+import { GraphQLError } from 'graphql';
+import { IncomingMessage } from 'http';
 import { admin, auth } from '../config/firebase-config';
 import { UserAuthInfoRequest } from '../utils/express-types';
 
@@ -29,20 +30,16 @@ export const restMiddleware = async (
   }
 };
 
-export const graphQlMiddleware = async ({
-  req,
-}: {
-  req: UserAuthInfoRequest;
-}) => {
+export const graphQlMiddleware = async ({ req }: { req: IncomingMessage }) => {
   const token = req.headers.authorization?.split(' ')[1] || '';
   try {
     const decodeValue = await auth().verifyIdToken(token);
     const user = await admin.auth().getUser(decodeValue.uid);
     if (!user) {
-      throw new ApolloError('User is not authenticated', 'UNAUTHENTICATED');
+      throw new GraphQLError('User is not authenticated');
     }
     return { user };
   } catch (error) {
-    throw new ApolloError((error as Error).message, 'UNAUTHENTICATED');
+    throw new GraphQLError((error as Error).message);
   }
 };

@@ -1,4 +1,5 @@
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer } from '@apollo/server';
+import { startStandaloneServer } from '@apollo/server/standalone';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
@@ -7,8 +8,8 @@ import { initializeFirebaseApp } from './config/firebase-config';
 import { resolvers } from './graphql/resolvers';
 import { schema } from './graphql/schema';
 import {
-  restMiddleware,
   graphQlMiddleware,
+  restMiddleware,
 } from './middleware/auth-middleware';
 const categories = require('./routes/categories');
 const todo = require('./routes/todo');
@@ -31,14 +32,13 @@ const startServer = async () => {
   const server = new ApolloServer({
     typeDefs: schema,
     resolvers,
-    context: graphQlMiddleware,
   });
-  await server.start();
-  server.applyMiddleware({ app, path: '/graphql' });
   await initializeFirebaseApp();
-  app.listen(port, () => {
-    console.log(`Expense-core listening at http://localhost:${port}`);
+  const { url } = await startStandaloneServer(server, {
+    context: graphQlMiddleware,
+    listen: { port, path: '/graphql' },
   });
+  console.log(`🚀  Server ready at: ${url}`);
 };
 
 startServer();

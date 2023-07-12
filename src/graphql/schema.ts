@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server-express';
+const gql = String.raw;
 
 // GraphQL schema
 export const schema = gql`
