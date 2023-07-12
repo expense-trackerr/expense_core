@@ -24,23 +24,11 @@ export type Category = {
 export type Query = {
   __typename?: 'Query';
   getCategories: Array<Category>;
-  getUser: Array<User>;
 };
 
 
 export type QueryGetCategoriesArgs = {
   userId: Scalars['String']['input'];
-};
-
-
-export type QueryGetUserArgs = {
-  age: Scalars['Int']['input'];
-};
-
-export type User = {
-  __typename?: 'User';
-  age: Scalars['Int']['output'];
-  name: Scalars['String']['output'];
 };
 
 
@@ -116,20 +104,16 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Category: ResolverTypeWrapper<Category>;
-  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
-  User: ResolverTypeWrapper<User>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   Category: Category;
-  Int: Scalars['Int']['output'];
   Query: {};
   String: Scalars['String']['output'];
-  User: User;
 };
 
 export type CategoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = {
@@ -139,18 +123,10 @@ export type CategoryResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getCategories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<QueryGetCategoriesArgs, 'userId'>>;
-  getUser?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'age'>>;
-};
-
-export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
-  age?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
   Category?: CategoryResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  User?: UserResolvers<ContextType>;
 };
 
