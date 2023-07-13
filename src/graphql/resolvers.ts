@@ -1,5 +1,5 @@
 import db from '../db/database';
-import { Resolvers } from '../generated/graphql';
+import { Resolvers } from '../generated/generatedGraphqlTypes';
 
 // Root resolver
 export const resolvers: Resolvers = {
