@@ -1,4 +1,4 @@
-import { ApolloServer } from '@apollo/server';
+import { ApolloServer, BaseContext } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import cors from 'cors';
 import express from 'express';
@@ -29,7 +29,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'dev') {
 }
 
 const startServer = async () => {
-  const server = new ApolloServer({
+  const server = new ApolloServer<BaseContext>({
     typeDefs: schema,
     resolvers,
   });

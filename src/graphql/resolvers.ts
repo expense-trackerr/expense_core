@@ -1,7 +1,8 @@
 import db from '../db/database';
+import { Resolvers } from '../generated/graphql';
 
 // Root resolver
-export const resolvers = {
+export const resolvers: Resolvers = {
   Query: {
     getCategories: async (_: any, { userId }: { userId: string }) => {
       try {
