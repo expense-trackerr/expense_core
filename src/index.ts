@@ -1,5 +1,4 @@
-import { ApolloServer, BaseContext } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
+import { ApolloServer } from 'apollo-server-express';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
@@ -29,23 +28,17 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'dev') {
 }
 
 const startServer = async () => {
-  const server = new ApolloServer<BaseContext>({
+  const server = new ApolloServer({
     typeDefs: schema,
     resolvers,
-  });
-  await initializeFirebaseApp();
-  const { url } = await startStandaloneServer(server, {
     context: graphQlMiddleware,
-    listen: { port, path: '/graphql' },
   });
-  console.log(`🚀  Server ready at: ${url}`);
+  await server.start();
+  server.applyMiddleware({ app, path: '/graphql' });
+  await initializeFirebaseApp();
+  app.listen(port, () => {
+    console.log(`Expense-core listening at http://localhost:${port}`);
+  });
 };
-
-// const startServer = async () => {
-//   await initializeFirebaseApp();
-//   app.listen(port, () => {
-//     console.log(`Expense-core listening at http://localhost:${port}`);
-//   });
-// };
 
 startServer();
