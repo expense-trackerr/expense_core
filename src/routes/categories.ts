@@ -81,7 +81,7 @@ router.post('/create', async (req: UserInfoRequest, res) => {
 
 // DB
 // Deletes entries in the categories table
-router.delete('/delete', async (req: UserInfoRequest, res) => {
+router.post('/delete', async (req: UserInfoRequest, res) => {
   const { categoriesId }: { categoriesId: number | number[] } = req.body;
   const userUid = req.userUid;
   try {

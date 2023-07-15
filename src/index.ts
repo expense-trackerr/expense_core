@@ -41,4 +41,11 @@ const startServer = async () => {
   console.log(`🚀  Server ready at: ${url}`);
 };
 
+// const startServer = async () => {
+//   await initializeFirebaseApp();
+//   app.listen(port, () => {
+//     console.log(`Expense-core listening at http://localhost:${port}`);
+//   });
+// };
+
 startServer();
