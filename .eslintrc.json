@@ -19,6 +19,7 @@
     "@typescript-eslint/comma-dangle": "off",
     "import/no-extraneous-dependencies": ["off"],
     "no-unused-vars": "warn",
-    "import/named": "off"
+    "import/named": "off",
+    "@typescript-eslint/brace-style": "off"
   }
 }

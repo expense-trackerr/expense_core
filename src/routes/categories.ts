@@ -81,25 +81,31 @@ router.post('/create', async (req: UserInfoRequest, res) => {
 
 // DB
 // Deletes entries in the categories table
-router.post('/delete', async (req: UserInfoRequest, res) => {
-  const { categories }: { categories: string | string[] } = req.body;
+router.delete('/delete', async (req: UserInfoRequest, res) => {
+  const { categoriesId }: { categoriesId: number | number[] } = req.body;
   const userUid = req.userUid;
   try {
-    if (typeof categories === 'string') {
-      await db.query('DELETE FROM categories WHERE name = ? AND user_uid = ?', [
-        categories,
+    if (!categoriesId) {
+      return res.status(400).json({ message: 'Category ID is not present' });
+    }
+    // Deleting one cateogry
+    if (typeof categoriesId === 'number') {
+      await db.query('DELETE FROM categories WHERE id = ? AND user_uid = ?', [
+        categoriesId,
         userUid,
       ]);
-    } else {
-      const deletePromises = categories.map((category) => {
+    }
+    // Deleting multiple categories
+    else {
+      const deletePromises = categoriesId.map((id) => {
         return db.query(
-          'DELETE FROM categories WHERE name = ? AND user_uid = ?',
-          [category, userUid]
+          'DELETE FROM categories WHERE id = ? AND user_uid = ?',
+          [id, userUid]
         );
       });
       await Promise.all(deletePromises);
     }
-    res.status(201).json({ message: 'Category deleted successfully' });
+    res.status(200).json({ message: 'Category deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }

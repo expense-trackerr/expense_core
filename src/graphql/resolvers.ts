@@ -12,7 +12,7 @@ export const resolvers: Resolvers = {
           );
         }
         const categories = await db.query(
-          'SELECT name FROM categories WHERE user_uid = ?',
+          'SELECT id, name FROM categories WHERE user_uid = ?',
           [userId]
         );
         return categories[0];
