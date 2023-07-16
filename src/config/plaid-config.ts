@@ -15,4 +15,4 @@ const configuration = new Configuration({
   },
 });
 
-export const client = new PlaidApi(configuration);
+export const plaidClient = new PlaidApi(configuration);

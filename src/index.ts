@@ -9,6 +9,7 @@ import { schema } from './graphql/schema';
 import { graphQlMiddleware, restMiddleware } from './middleware/auth-middleware';
 const categories = require('./routes/categories');
 const todo = require('./routes/todo');
+const plaid = require('./routes/plaid');
 
 // Middlewares
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(restMiddleware);
 app.use('/api/categories', categories);
 app.use('/api/todo', todo);
+app.use('/api', plaid);
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'dev') {
   app.use(morgan('tiny'));
 }
