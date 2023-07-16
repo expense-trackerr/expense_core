@@ -6,10 +6,7 @@ import morgan from 'morgan';
 import { initializeFirebaseApp } from './config/firebase-config';
 import { resolvers } from './graphql/resolvers';
 import { schema } from './graphql/schema';
-import {
-  graphQlMiddleware,
-  restMiddleware,
-} from './middleware/auth-middleware';
+import { graphQlMiddleware, restMiddleware } from './middleware/auth-middleware';
 const categories = require('./routes/categories');
 const todo = require('./routes/todo');
 

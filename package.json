@@ -7,7 +7,8 @@
     "dev": "nodemon ./src/index.ts",
     "start": "node src/index.ts",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
-    "codegen": "graphql-codegen --config ./src/graphql/codegen.ts"
+    "codegen": "graphql-codegen --config ./src/graphql/codegen.ts",
+    "prettier": "prettier --write --config prettierrc.json \"src/**/*.{js,jsx,ts,tsx,json}\" "
   },
   "author": "",
   "license": "ISC",
@@ -21,7 +22,8 @@
     "graphql": "^16.7.1",
     "helmet": "^6.0.1",
     "morgan": "^1.10.0",
-    "mysql2": "^3.2.0"
+    "mysql2": "^3.2.0",
+    "prettier": "^3.0.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "4.0.1",

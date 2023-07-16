@@ -4,11 +4,7 @@ import { IncomingMessage } from 'http';
 import { admin, auth } from '../config/firebase-config';
 import { UserAuthInfoRequest } from '../utils/express-types';
 
-export const restMiddleware = async (
-  req: UserAuthInfoRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const restMiddleware = async (req: UserAuthInfoRequest, res: Response, next: NextFunction) => {
   // Skip authentication check for GraphQL requests
   if (req.path === '/graphql') {
     return next();

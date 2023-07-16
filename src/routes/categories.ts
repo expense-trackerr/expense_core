@@ -1,6 +1,6 @@
 import express from 'express';
 import { UserInfoRequest } from '../utils/express-types';
-import db from '../db/database';
+import db from '../config/database';
 
 const router = express.Router();
 
@@ -11,14 +11,10 @@ router.get('/', async (req: UserInfoRequest, res) => {
   try {
     if (!userUid) {
       return res.status(400).json({
-        message:
-          'User ID is not present. Ensure that you are logged in to the application',
+        message: 'User ID is not present. Ensure that you are logged in to the application',
       });
     }
-    const categories = await db.query(
-      'SELECT name FROM categories WHERE user_uid = ?',
-      [userUid]
-    );
+    const categories = await db.query('SELECT name FROM categories WHERE user_uid = ?', [userUid]);
     res.status(200).json(categories[0]);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
@@ -33,26 +29,18 @@ router.post('/create', async (req: UserInfoRequest, res) => {
   try {
     if (!userUid) {
       return res.status(400).json({
-        message:
-          'User ID is not present. Ensure that you are logged in to the application',
+        message: 'User ID is not present. Ensure that you are logged in to the application',
       });
     }
     // Categories cannot be empty
-    if (
-      !categories ||
-      categories.length === 0 ||
-      categories.some((category) => !category.trim())
-    ) {
+    if (!categories || categories.length === 0 || categories.some((category) => !category.trim())) {
       return res.status(400).json({ message: 'Categories cannot be empty' });
     }
 
     // Unique categories validation
     const duplicateCategories = await Promise.all(
       categories.map((category) => {
-        return db.query(
-          'SELECT name FROM categories WHERE name = ? AND user_uid = ?',
-          [category, userUid]
-        );
+        return db.query('SELECT name FROM categories WHERE name = ? AND user_uid = ?', [category, userUid]);
       })
     );
 
@@ -67,10 +55,7 @@ router.post('/create', async (req: UserInfoRequest, res) => {
     }
 
     const insertPromises = categories.map((category) => {
-      return db.query('INSERT INTO categories (name, user_uid) VALUES (?, ?)', [
-        category,
-        userUid,
-      ]);
+      return db.query('INSERT INTO categories (name, user_uid) VALUES (?, ?)', [category, userUid]);
     });
     await Promise.all(insertPromises);
     res.status(201).json({ message: 'Category created successfully' });
@@ -90,18 +75,12 @@ router.post('/delete', async (req: UserInfoRequest, res) => {
     }
     // Deleting one cateogry
     if (typeof categoriesId === 'number') {
-      await db.query('DELETE FROM categories WHERE id = ? AND user_uid = ?', [
-        categoriesId,
-        userUid,
-      ]);
+      await db.query('DELETE FROM categories WHERE id = ? AND user_uid = ?', [categoriesId, userUid]);
     }
     // Deleting multiple categories
     else {
       const deletePromises = categoriesId.map((id) => {
-        return db.query(
-          'DELETE FROM categories WHERE id = ? AND user_uid = ?',
-          [id, userUid]
-        );
+        return db.query('DELETE FROM categories WHERE id = ? AND user_uid = ?', [id, userUid]);
       });
       await Promise.all(deletePromises);
     }
