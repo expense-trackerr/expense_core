@@ -10,6 +10,7 @@ import { graphQlMiddleware, restMiddleware } from './middleware/auth-middleware'
 const categories = require('./routes/categories');
 const todo = require('./routes/todo');
 const plaid = require('./routes/plaid');
+require('dotenv').config();
 
 // Middlewares
 const app = express();

@@ -9,26 +9,26 @@ const PLAID_PRODUCTS = (process.env.PLAID_PRODUCTS || Products.Transactions).spl
 const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || 'US').split(',') as CountryCode[];
 const PLAID_REDIRECT_URI = process.env.PLAID_REDIRECT_URI || '';
 
-router.post('/create_link_token', function (request: UserInfoRequest, response, next) {
-  Promise.resolve()
-    .then(async function () {
-      const configs = {
-        user: {
-          client_user_id: request.userUid || '',
-        },
-        // TODO: Get client name from Firebase
-        client_name: 'Plaid Quickstart',
-        products: PLAID_PRODUCTS,
-        country_codes: PLAID_COUNTRY_CODES,
-        language: 'en',
-        ...(PLAID_REDIRECT_URI !== '' && { redirect_uri: PLAID_REDIRECT_URI }),
-      };
+router.post('/create_link_token', async (request: UserInfoRequest, response, next) => {
+  try {
+    const configs = {
+      user: {
+        client_user_id: request.userUid || '',
+      },
+      // TODO: Get client name from Firebase
+      client_name: 'Plaid Quickstart',
+      products: PLAID_PRODUCTS,
+      country_codes: PLAID_COUNTRY_CODES,
+      language: 'en',
+      ...(PLAID_REDIRECT_URI !== '' && { redirect_uri: PLAID_REDIRECT_URI }),
+    };
 
-      const createTokenResponse = await plaidClient.linkTokenCreate(configs);
-      console.log(createTokenResponse.data);
-      response.json(createTokenResponse.data);
-    })
-    .catch(next);
+    const createTokenResponse = await plaidClient.linkTokenCreate(configs);
+    response.status(200).json(createTokenResponse.data);
+  } catch (error) {
+    console.error('Error creating link token:', error);
+    next();
+  }
 });
 
 router.post('/set_access_token', function (request, response, next) {
@@ -38,14 +38,13 @@ router.post('/set_access_token', function (request, response, next) {
       const tokenResponse = await plaidClient.itemPublicTokenExchange({
         public_token: publicToken,
       });
-      console.log(tokenResponse.data);
+      console.log('token data', tokenResponse.data);
       ACCESS_TOKEN = tokenResponse.data.access_token;
       response.json({
         // TODO: Store this in the DB securely
         // the 'access_token' is a private token, DO NOT pass this token to the frontend in your production environment
         access_token: ACCESS_TOKEN,
         item_id: tokenResponse.data.item_id,
-        error: null,
       });
     })
     .catch(next);

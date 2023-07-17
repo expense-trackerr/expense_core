@@ -1,4 +1,5 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
+require('dotenv').config();
 
 const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
