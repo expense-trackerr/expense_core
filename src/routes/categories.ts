@@ -45,6 +45,7 @@ router.post('/create', async (req: UserInfoRequest, res) => {
     );
 
     const duplicateCategoryNames = duplicateCategories
+      // @ts-ignore: Will resolve it later
       .map((result) => result[0][0]?.name)
       .filter((name) => name !== undefined);
 

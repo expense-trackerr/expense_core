@@ -9,11 +9,11 @@ export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' |
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string };
-  String: { input: string; output: string };
-  Boolean: { input: boolean; output: boolean };
-  Int: { input: number; output: number };
-  Float: { input: number; output: number };
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
 };
 
 export type Category = {
@@ -27,18 +27,20 @@ export type Query = {
   getCategories: Array<Category>;
 };
 
+
 export type QueryGetCategoriesArgs = {
   userId: Scalars['String']['input'];
 };
 
+
+
 export type ResolverTypeWrapper<T> = Promise<T> | T;
+
 
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
   resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
-export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
-  | ResolverFn<TResult, TParent, TContext, TArgs>
-  | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> = ResolverFn<TResult, TParent, TContext, TArgs> | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
@@ -85,11 +87,7 @@ export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
   info: GraphQLResolveInfo
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
-export type IsTypeOfResolverFn<T = {}, TContext = {}> = (
-  obj: T,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => boolean | Promise<boolean>;
+export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
@@ -100,6 +98,8 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
   context: TContext,
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
+
+
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
@@ -119,28 +119,18 @@ export type ResolversParentTypes = {
   String: Scalars['String']['output'];
 };
 
-export type CategoryResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category'],
-> = {
+export type CategoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = {
   id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type QueryResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
-> = {
-  getCategories?: Resolver<
-    Array<ResolversTypes['Category']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryGetCategoriesArgs, 'userId'>
-  >;
+export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getCategories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<QueryGetCategoriesArgs, 'userId'>>;
 };
 
 export type Resolvers<ContextType = any> = {
   Category?: CategoryResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 };
+
