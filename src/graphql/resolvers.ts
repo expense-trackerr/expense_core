@@ -1,4 +1,4 @@
-import { Resolvers } from '../generated/generatedGraphqlTypes';
+import { Resolvers } from './generatedGraphqlTypes';
 
 // Root resolver
 export const resolvers: Resolvers = {
