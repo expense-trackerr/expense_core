@@ -15,7 +15,7 @@ export const createUser = async (req: UserInfoRequest, res: Response) => {
         email,
       },
     });
-    res.status(201).json('User created successfully', newUser);
+    res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while creating the user', message: (error as Error).message });
   }
