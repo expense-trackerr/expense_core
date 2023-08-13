@@ -16,7 +16,7 @@ export const createUser = async (req: UserInfoRequest, res: Response) => {
     // check if user is already present in the database, then do nothing
     const userAlreadyPresent = await prisma.user.findUnique({
       where: {
-        user_id: userUid,
+        id: userUid,
       },
     });
     if (userAlreadyPresent) {
@@ -25,7 +25,7 @@ export const createUser = async (req: UserInfoRequest, res: Response) => {
 
     const newUser = await prisma.user.create({
       data: {
-        user_id: userUid,
+        id: userUid,
         name,
         email,
       },
