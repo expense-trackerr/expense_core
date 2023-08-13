@@ -1,4 +1,5 @@
 import mysql from 'mysql2';
+import { PrismaClient } from '@prisma/client';
 
 const pool = mysql.createPool({
   host: 'localhost',
@@ -8,3 +9,5 @@ const pool = mysql.createPool({
 });
 
 export default pool.promise();
+
+export const prisma = new PrismaClient();
