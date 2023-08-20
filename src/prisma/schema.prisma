@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CategoryTypeName {
+  INCOME
+  EXPENSE
+}
+
 model User {
   id         String     @id
   name       String
@@ -19,14 +24,24 @@ model User {
   categories Category[]
 }
 
+model CategoryType {
+  id         String           @id @default(uuid())
+  name       CategoryTypeName
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+  categories Category[]
+}
+
 model Category {
-  id           String        @id @default(uuid())
-  name         String
-  created_at   DateTime      @default(now())
-  updated_at   DateTime      @updatedAt
-  User         User?         @relation(fields: [user_id], references: [id])
-  user_id      String?
-  transactions Transaction[]
+  id             String        @id @default(uuid())
+  name           String
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  User           User?         @relation(fields: [user_id], references: [id])
+  user_id        String?
+  transactions   Transaction[]
+  CategoryType   CategoryType? @relation(fields: [categoryTypeId], references: [id])
+  categoryTypeId String?
 }
 
 model Transaction {
