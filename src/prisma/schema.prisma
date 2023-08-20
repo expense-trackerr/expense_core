@@ -11,8 +11,8 @@ datasource db {
 }
 
 enum CategoryTypeName {
-  INCOME
-  EXPENSE
+  Income
+  Expense
 }
 
 model User {
