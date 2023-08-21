@@ -35,7 +35,7 @@ model CategoryType {
 model Category {
   id             String        @id @default(uuid())
   name           String
-  budget         Decimal
+  budget         Decimal       @db.Decimal(10, 2)
   created_at     DateTime      @default(now())
   updated_at     DateTime      @updatedAt
   User           User?         @relation(fields: [user_id], references: [id])
@@ -49,7 +49,7 @@ model Transaction {
   id                  String              @id @default(uuid())
   date                DateTime
   name                String
-  amount              Decimal
+  amount              Decimal             @db.Decimal(10, 2)
   created_at          DateTime            @default(now())
   updated_at          DateTime            @updatedAt
   category            Category            @relation(fields: [category_id], references: [id])
@@ -62,7 +62,7 @@ model TransactionHistory {
   transaction    Transaction @relation(fields: [transaction_id], references: [id])
   date           DateTime
   name           String
-  amount         Decimal
+  amount         Decimal     @db.Decimal(10, 2)
   created_at     DateTime    @default(now())
   updated_at     DateTime    @updatedAt
 }
