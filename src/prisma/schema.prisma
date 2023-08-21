@@ -35,6 +35,7 @@ model CategoryType {
 model Category {
   id             String        @id @default(uuid())
   name           String
+  budget         Decimal
   created_at     DateTime      @default(now())
   updated_at     DateTime      @updatedAt
   User           User?         @relation(fields: [user_id], references: [id])
