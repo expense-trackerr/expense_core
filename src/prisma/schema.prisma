@@ -16,12 +16,13 @@ enum CategoryTypeName {
 }
 
 model User {
-  id         String     @id
-  name       String
-  email      String     @unique
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  categories Category[]
+  id           String     @id
+  name         String
+  email        String     @unique
+  access_token String
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+  categories   Category[]
 }
 
 model CategoryType {
@@ -46,23 +47,12 @@ model Category {
 }
 
 model Transaction {
-  id                  String              @id @default(uuid())
-  date                DateTime
-  name                String
-  amount              Decimal             @db.Decimal(10, 2)
-  created_at          DateTime            @default(now())
-  updated_at          DateTime            @updatedAt
-  category            Category            @relation(fields: [category_id], references: [id])
-  category_id         String
-  transaction_history TransactionHistory?
-}
-
-model TransactionHistory {
-  transaction_id String      @id
-  transaction    Transaction @relation(fields: [transaction_id], references: [id])
-  date           DateTime
-  name           String
-  amount         Decimal     @db.Decimal(10, 2)
-  created_at     DateTime    @default(now())
-  updated_at     DateTime    @updatedAt
+  id          String   @id @default(uuid())
+  date        DateTime
+  name        String
+  amount      Decimal  @db.Decimal(10, 2)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  category    Category @relation(fields: [category_id], references: [id])
+  category_id String
 }
