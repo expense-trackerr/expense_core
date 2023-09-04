@@ -19,7 +19,7 @@ model User {
   id           String     @id
   name         String
   email        String     @unique
-  access_token String
+  access_token String     @unique
   created_at   DateTime   @default(now())
   updated_at   DateTime   @updatedAt
   categories   Category[]
@@ -39,11 +39,11 @@ model Category {
   budget         Decimal       @db.Decimal(10, 2)
   created_at     DateTime      @default(now())
   updated_at     DateTime      @updatedAt
-  User           User?         @relation(fields: [user_id], references: [id])
-  user_id        String?
+  User           User          @relation(fields: [user_id], references: [id])
+  user_id        String
   transactions   Transaction[]
-  CategoryType   CategoryType? @relation(fields: [categoryTypeId], references: [id])
-  categoryTypeId String?
+  CategoryType   CategoryType  @relation(fields: [categoryTypeId], references: [id])
+  categoryTypeId String
 }
 
 model Transaction {
