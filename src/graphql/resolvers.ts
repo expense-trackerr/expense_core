@@ -1,19 +1,20 @@
-import db from '../config/database';
-import { Resolvers } from '../generated/generatedGraphqlTypes';
+import { prisma } from '../config/database';
+import { QueryGetCategoriesArgs, Resolvers } from './generatedGraphqlTypes';
 
-// Root resolver
 export const resolvers: Resolvers = {
   Query: {
-    getCategories: async (_: any, { userId }: { userId: string }) => {
-      try {
-        if (!userId) {
-          throw new Error('User ID is not present. Ensure that you are logged in to the application');
-        }
-        const categories = await db.query('SELECT id, name FROM categories WHERE user_uid = ?', [userId]);
-        return categories[0];
-      } catch (error) {
-        throw new Error((error as Error).message);
-      }
+    getCategories: async (_: any, args: QueryGetCategoriesArgs) => {
+      const userId = args.userId;
+      const categories = await prisma.category.findMany({
+        where: {
+          user_id: userId,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+      return categories;
     },
   },
 };

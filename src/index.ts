@@ -8,6 +8,7 @@ import { resolvers } from './graphql/resolvers';
 import { schema } from './graphql/schema';
 import { graphQlMiddleware, restMiddleware } from './middleware/auth-middleware';
 const categories = require('./routes/categories');
+const users = require('./routes/users');
 const todo = require('./routes/todo');
 const plaid = require('./routes/plaid');
 require('dotenv').config();
@@ -21,6 +22,7 @@ app.use(express.json());
 // @ts-ignore: Will resolve it later
 app.use(restMiddleware);
 app.use('/api/categories', categories);
+app.use('/users', users);
 app.use('/api/todo', todo);
 app.use('/api', plaid);
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'dev') {

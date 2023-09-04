@@ -5,23 +5,6 @@ import db from '../config/database';
 const router = express.Router();
 
 //DB
-// Gets entries from the categories table based on the user id
-router.get('/', async (req: UserInfoRequest, res) => {
-  const userUid = req.userUid;
-  try {
-    if (!userUid) {
-      return res.status(400).json({
-        message: 'User ID is not present. Ensure that you are logged in to the application',
-      });
-    }
-    const categories = await db.query('SELECT name FROM categories WHERE user_uid = ?', [userUid]);
-    res.status(200).json(categories[0]);
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-  }
-});
-
-//DB
 // Creates entries in the categories table
 router.post('/create', async (req: UserInfoRequest, res) => {
   const { categories }: { categories: string[] } = req.body;
@@ -45,6 +28,7 @@ router.post('/create', async (req: UserInfoRequest, res) => {
     );
 
     const duplicateCategoryNames = duplicateCategories
+      // @ts-ignore: Will resolve it later
       .map((result) => result[0][0]?.name)
       .filter((name) => name !== undefined);
 

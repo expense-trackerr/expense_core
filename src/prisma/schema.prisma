@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum CategoryTypeName {
+  Income
+  Expense
+}
+
+model User {
+  id           String     @id
+  name         String
+  email        String     @unique
+  access_token String
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+  categories   Category[]
+}
+
+model CategoryType {
+  id         String           @id @default(uuid())
+  name       CategoryTypeName
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+  categories Category[]
+}
+
+model Category {
+  id             String        @id @default(uuid())
+  name           String
+  budget         Decimal       @db.Decimal(10, 2)
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  User           User?         @relation(fields: [user_id], references: [id])
+  user_id        String?
+  transactions   Transaction[]
+  CategoryType   CategoryType? @relation(fields: [categoryTypeId], references: [id])
+  categoryTypeId String?
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  date        DateTime
+  name        String
+  amount      Decimal  @db.Decimal(10, 2)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  category    Category @relation(fields: [category_id], references: [id])
+  category_id String
+}
