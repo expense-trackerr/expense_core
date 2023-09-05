@@ -97,4 +97,20 @@ router.get('/transactions', async (request, response, next) => {
   }
 });
 
+// Remove the item associated with the access_token
+router.post('/item/remove', async (request: UserInfoRequest, response, next) => {
+  // const userId = request.userUid;
+  // FIXME - Get the access token from the DB
+  const accessToken = ACCESS_TOKEN;
+  try {
+    const removeItemResponse = await plaidClient.itemRemove({
+      access_token: accessToken,
+    });
+    response.status(200).json(removeItemResponse.data);
+  } catch (error) {
+    console.error('Error removing item:', error);
+    next();
+  }
+});
+
 module.exports = router;
