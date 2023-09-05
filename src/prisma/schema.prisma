@@ -24,6 +24,8 @@ model User {
   categories      Category[]
   linked_accounts LinkedAccount[]
   transactions    Transaction[]
+
+  @@map("user")
 }
 
 model LinkedAccount {
@@ -36,6 +38,8 @@ model LinkedAccount {
   users        User          @relation(fields: [user_id], references: [id])
   user_id      String
   transactions Transaction[]
+
+  @@map("linked_account")
 }
 
 model CategoryType {
@@ -44,6 +48,8 @@ model CategoryType {
   created_at DateTime         @default(now())
   updated_at DateTime         @updatedAt
   categories Category[]
+
+  @@map("category_type")
 }
 
 model Category {
@@ -57,19 +63,23 @@ model Category {
   transactions     Transaction[]
   category_type    CategoryType  @relation(fields: [category_type_id], references: [id])
   category_type_id String
+
+  @@map("category")
 }
 
 model Transaction {
-  id                   String         @id @default(uuid())
-  date                 DateTime
-  name                 String
-  amount               Decimal        @db.Decimal(10, 2)
-  created_at           DateTime       @default(now())
-  updated_at           DateTime       @updatedAt
-  category             Category?      @relation(fields: [category_id], references: [id])
-  category_id          String?
-  User                 User           @relation(fields: [user_id], references: [id])
-  user_id              String
-  LinkedAccount        LinkedAccount? @relation(fields: [linkedAccountItem_id], references: [item_id])
-  linkedAccountItem_id String?
+  id                     String         @id @default(uuid())
+  date                   DateTime
+  name                   String
+  amount                 Decimal        @db.Decimal(10, 2)
+  created_at             DateTime       @default(now())
+  updated_at             DateTime       @updatedAt
+  category               Category?      @relation(fields: [category_id], references: [id])
+  category_id            String?
+  User                   User           @relation(fields: [user_id], references: [id])
+  user_id                String
+  linked_account         LinkedAccount? @relation(fields: [linked_account_item_id], references: [item_id])
+  linked_account_item_id String?
+
+  @@map("transaction")
 }

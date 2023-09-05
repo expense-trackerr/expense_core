@@ -52,7 +52,7 @@ router.post('/set_access_token', function (request, response, next) {
       console.log('token data', tokenResponse.data);
       ACCESS_TOKEN = tokenResponse.data.access_token;
       response.json({
-        // TODO: Store this in the DB securely
+        // FIXME: Store this in the DB securely
         // the 'access_token' is a private token, DO NOT pass this token to the frontend in your production environment
         access_token: ACCESS_TOKEN,
         item_id: tokenResponse.data.item_id,
