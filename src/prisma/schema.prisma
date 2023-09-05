@@ -19,7 +19,6 @@ model User {
   id              String          @id
   name            String
   email           String          @unique
-  access_token    String?         @unique
   created_at      DateTime        @default(now())
   updated_at      DateTime        @updatedAt
   categories      Category[]
@@ -33,6 +32,7 @@ model LinkedAccount {
   alias_name   String?
   created_at   DateTime      @default(now())
   updated_at   DateTime      @updatedAt
+  access_token String        @unique
   users        User          @relation(fields: [user_id], references: [id])
   user_id      String
   transactions Transaction[]
