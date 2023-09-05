@@ -16,13 +16,26 @@ enum CategoryTypeName {
 }
 
 model User {
-  id           String     @id
+  id              String          @id
+  name            String
+  email           String          @unique
+  access_token    String?         @unique
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+  categories      Category[]
+  linked_accounts LinkedAccount[]
+  transactions    Transaction[]
+}
+
+model LinkedAccount {
+  item_id      String        @id @default(uuid())
   name         String
-  email        String     @unique
-  access_token String     @unique
-  created_at   DateTime   @default(now())
-  updated_at   DateTime   @updatedAt
-  categories   Category[]
+  alias_name   String?
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+  users        User          @relation(fields: [user_id], references: [id])
+  user_id      String
+  transactions Transaction[]
 }
 
 model CategoryType {
@@ -34,25 +47,29 @@ model CategoryType {
 }
 
 model Category {
-  id             String        @id @default(uuid())
-  name           String
-  budget         Decimal       @db.Decimal(10, 2)
-  created_at     DateTime      @default(now())
-  updated_at     DateTime      @updatedAt
-  User           User          @relation(fields: [user_id], references: [id])
-  user_id        String
-  transactions   Transaction[]
-  CategoryType   CategoryType  @relation(fields: [categoryTypeId], references: [id])
-  categoryTypeId String
+  id               String        @id @default(uuid())
+  name             String
+  budget           Decimal?      @db.Decimal(10, 2)
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+  User             User          @relation(fields: [user_id], references: [id])
+  user_id          String
+  transactions     Transaction[]
+  category_type    CategoryType  @relation(fields: [category_type_id], references: [id])
+  category_type_id String
 }
 
 model Transaction {
-  id          String   @id @default(uuid())
-  date        DateTime
-  name        String
-  amount      Decimal  @db.Decimal(10, 2)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  category    Category @relation(fields: [category_id], references: [id])
-  category_id String
+  id                   String         @id @default(uuid())
+  date                 DateTime
+  name                 String
+  amount               Decimal        @db.Decimal(10, 2)
+  created_at           DateTime       @default(now())
+  updated_at           DateTime       @updatedAt
+  category             Category?      @relation(fields: [category_id], references: [id])
+  category_id          String?
+  User                 User           @relation(fields: [user_id], references: [id])
+  user_id              String
+  LinkedAccount        LinkedAccount? @relation(fields: [linkedAccountItem_id], references: [item_id])
+  linkedAccountItem_id String?
 }
