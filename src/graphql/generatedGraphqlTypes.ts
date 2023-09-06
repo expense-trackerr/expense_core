@@ -22,9 +22,18 @@ export type Category = {
   name?: Maybe<Scalars['String']['output']>;
 };
 
+export type LinkedAccount = {
+  __typename?: 'LinkedAccount';
+  alias_name?: Maybe<Scalars['String']['output']>;
+  created_at: Scalars['String']['output'];
+  item_id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   getCategories: Array<Category>;
+  getLinkedAccounts: Array<LinkedAccount>;
 };
 
 
@@ -32,12 +41,9 @@ export type QueryGetCategoriesArgs = {
   userId: Scalars['String']['input'];
 };
 
-export type User = {
-  __typename?: 'User';
-  categories: Array<Category>;
-  email: Scalars['String']['output'];
-  id: Scalars['String']['output'];
-  name: Scalars['String']['output'];
+
+export type QueryGetLinkedAccountsArgs = {
+  userId: Scalars['String']['input'];
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -114,18 +120,18 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Category: ResolverTypeWrapper<Category>;
+  LinkedAccount: ResolverTypeWrapper<LinkedAccount>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
-  User: ResolverTypeWrapper<User>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   Category: Category;
+  LinkedAccount: LinkedAccount;
   Query: {};
   String: Scalars['String']['output'];
-  User: User;
 }>;
 
 export type CategoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = ResolversObject<{
@@ -134,21 +140,22 @@ export type CategoryResolvers<ContextType = any, ParentType extends ResolversPar
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  getCategories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<QueryGetCategoriesArgs, 'userId'>>;
-}>;
-
-export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
-  categories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType>;
-  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+export type LinkedAccountResolvers<ContextType = any, ParentType extends ResolversParentTypes['LinkedAccount'] = ResolversParentTypes['LinkedAccount']> = ResolversObject<{
+  alias_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  item_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  getCategories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<QueryGetCategoriesArgs, 'userId'>>;
+  getLinkedAccounts?: Resolver<Array<ResolversTypes['LinkedAccount']>, ParentType, ContextType, RequireFields<QueryGetLinkedAccountsArgs, 'userId'>>;
+}>;
+
 export type Resolvers<ContextType = any> = ResolversObject<{
   Category?: CategoryResolvers<ContextType>;
+  LinkedAccount?: LinkedAccountResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  User?: UserResolvers<ContextType>;
 }>;
 
