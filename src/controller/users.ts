@@ -3,12 +3,13 @@ import { prisma } from '../config/database';
 import { UserInfoRequest } from '../utils/express-types';
 
 export const createUser = async (req: UserInfoRequest, res: Response) => {
-  const { userUid, name, email } = req.body;
+  const userUid = req.userUid;
+  const user = req.user;
 
   try {
-    if (!userUid) {
+    if (!userUid || !user?.email || !user?.name) {
       return res.status(400).json({
-        message: 'User ID is not present. Ensure that you are logged in to the application',
+        message: 'User is not present. Ensure that you are logged in to the application',
       });
     }
     // check if user is already present in the database, then do nothing
@@ -24,8 +25,8 @@ export const createUser = async (req: UserInfoRequest, res: Response) => {
     const newUser = await prisma.user.create({
       data: {
         id: userUid,
-        name,
-        email,
+        name: user.name,
+        email: user.email,
       },
     });
     res.status(201).json(newUser);

@@ -2,6 +2,7 @@ import express from 'express';
 import { CountryCode, Products, RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid';
 import { plaidClient } from '../config/plaid-config';
 import { UserInfoRequest } from '../utils/express-types';
+import { setAccessToken } from '../controller/plaid';
 
 const router = express.Router();
 let ACCESS_TOKEN = 'access-sandbox-565b0d29-b155-4bc7-b5fc-1275e050d721';
@@ -42,23 +43,68 @@ router.post('/create_link_token', async (request: UserInfoRequest, response, nex
   }
 });
 
-router.post('/set_access_token', function (request, response, next) {
+router.post('/set_access_token', async (request: UserInfoRequest, response, next) => {
   const { publicToken }: { publicToken: string } = request.body;
-  Promise.resolve()
-    .then(async function () {
-      const tokenResponse = await plaidClient.itemPublicTokenExchange({
-        public_token: publicToken,
+  const userUid = request.userUid;
+
+  // If user ID is not preset, return an error
+  if (!userUid) {
+    return response.status(400).json({
+      message: 'User ID is not present. Ensure that you are logged in to the application',
+    });
+  }
+
+  try {
+    // get the access token
+    const tokenResponse = await plaidClient.itemPublicTokenExchange({
+      public_token: publicToken,
+    });
+
+    // get the information about the item
+    const itemInfo = await plaidClient.itemGet({
+      access_token: tokenResponse.data.access_token,
+    });
+
+    const institutionId = itemInfo.data.item.institution_id;
+
+    if (!institutionId) {
+      return response.status(500).json({
+        message: 'Unable to fetch the institution ID from Plaid. Please try again',
       });
-      console.log('token data', tokenResponse.data);
-      ACCESS_TOKEN = tokenResponse.data.access_token;
-      response.json({
-        // FIXME: Store this in the DB securely
-        // the 'access_token' is a private token, DO NOT pass this token to the frontend in your production environment
-        access_token: ACCESS_TOKEN,
-        item_id: tokenResponse.data.item_id,
+    }
+
+    // get the institution details and get the name
+    const institutionInfo = await plaidClient.institutionsGetById({
+      institution_id: institutionId,
+      country_codes: PLAID_COUNTRY_CODES,
+    });
+
+    const institutionName = institutionInfo.data.institution.name;
+
+    // save the access token in the database
+    const databaseResponse = await setAccessToken({
+      userUid,
+      itemId: tokenResponse.data.item_id,
+      accessToken: tokenResponse.data.access_token,
+      institutionName,
+    });
+    console.log('databaseResponse:', databaseResponse);
+
+    if (!databaseResponse) {
+      return response.status(500).json({
+        message: 'Unable to save the access token in the database. Please try again',
       });
-    })
-    .catch(next);
+    }
+
+    return response.json({
+      item_id: databaseResponse,
+    });
+  } catch (error) {
+    response
+      .status(500)
+      .json({ error: 'Error getting or setting the access token', message: (error as Error).message });
+    next();
+  }
 });
 
 router.get('/transactions', async (request, response, next) => {
@@ -108,7 +154,7 @@ router.post('/item/remove', async (request: UserInfoRequest, response, next) => 
     });
     response.status(200).json(removeItemResponse.data);
   } catch (error) {
-    console.error('Error removing item:', error);
+    response.status(500).json({ error: 'Error removing the item', message: (error as Error).message });
     next();
   }
 });
