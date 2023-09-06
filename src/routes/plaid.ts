@@ -7,7 +7,7 @@ import { setAccessToken } from '../controller/plaid';
 const router = express.Router();
 let ACCESS_TOKEN = 'access-sandbox-565b0d29-b155-4bc7-b5fc-1275e050d721';
 const PLAID_PRODUCTS = (process.env.PLAID_PRODUCTS || Products.Transactions).split(',') as Products[];
-const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || 'US').split(',') as CountryCode[];
+const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || 'US, CA').split(',') as CountryCode[];
 const PLAID_REDIRECT_URI = process.env.PLAID_REDIRECT_URI || '';
 
 const compareTxnsByDateAscending = (a: Transaction, b: Transaction) => {
@@ -43,6 +43,7 @@ router.post('/create_link_token', async (request: UserInfoRequest, response, nex
   }
 });
 
+// Get and store the access token
 router.post('/set_access_token', async (request: UserInfoRequest, response, next) => {
   const { publicToken }: { publicToken: string } = request.body;
   const userUid = request.userUid;
@@ -88,16 +89,15 @@ router.post('/set_access_token', async (request: UserInfoRequest, response, next
       accessToken: tokenResponse.data.access_token,
       institutionName,
     });
-    console.log('databaseResponse:', databaseResponse);
 
     if (!databaseResponse) {
       return response.status(500).json({
         message: 'Unable to save the access token in the database. Please try again',
       });
     }
-
-    return response.json({
-      item_id: databaseResponse,
+    // Send the database response to the client
+    return response.status(201).json({
+      itemId: databaseResponse,
     });
   } catch (error) {
     response
@@ -107,6 +107,7 @@ router.post('/set_access_token', async (request: UserInfoRequest, response, next
   }
 });
 
+// Retrieve Transactions for an Item
 router.get('/transactions', async (request, response, next) => {
   try {
     let cursor = undefined;

@@ -8,7 +8,6 @@ type LinkAccountData = {
 };
 
 export const setAccessToken = async (linkAccountData: LinkAccountData) => {
-  console.log('linkAccountData:', linkAccountData);
   const { userUid, itemId, accessToken, institutionName } = linkAccountData;
 
   try {
