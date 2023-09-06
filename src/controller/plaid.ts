@@ -26,3 +26,19 @@ export const setAccessToken = async (linkAccountData: LinkAccountData) => {
     console.error('Error adding linked account to database:', error);
   }
 };
+
+export const updateAliasAccountName = async (itemId: string, aliasAccountName: string) => {
+  try {
+    const res = await prisma.linkedAccount.update({
+      where: {
+        item_id: itemId,
+      },
+      data: {
+        alias_name: aliasAccountName,
+      },
+    });
+    return res.item_id;
+  } catch (error) {
+    console.error('Error updating alias account name:', error);
+  }
+};

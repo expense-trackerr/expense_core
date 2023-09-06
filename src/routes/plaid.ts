@@ -2,7 +2,7 @@ import express from 'express';
 import { CountryCode, Products, RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid';
 import { plaidClient } from '../config/plaid-config';
 import { UserInfoRequest } from '../utils/express-types';
-import { setAccessToken } from '../controller/plaid';
+import { setAccessToken, updateAliasAccountName } from '../controller/plaid';
 
 const router = express.Router();
 let ACCESS_TOKEN = 'access-sandbox-565b0d29-b155-4bc7-b5fc-1275e050d721';
@@ -156,6 +156,26 @@ router.post('/item/remove', async (request: UserInfoRequest, response, next) => 
     response.status(200).json(removeItemResponse.data);
   } catch (error) {
     response.status(500).json({ error: 'Error removing the item', message: (error as Error).message });
+    next();
+  }
+});
+
+// Updates the Alias Account Name for an Item
+router.put('/update_account_name', async (request: UserInfoRequest, response, next) => {
+  const { accountName: newAccountName, itemId } = request.body;
+  if (!newAccountName || !itemId) {
+    return response.status(400).json({
+      message: 'Account name or item ID is not present. Please try again',
+    });
+  }
+  try {
+    const resItemId = updateAliasAccountName(itemId, newAccountName);
+    response.status(200).json({
+      message: 'Account name updated successfully',
+      itemId: resItemId,
+    });
+  } catch (error) {
+    response.status(500).json({ error: 'Error updating the alias account name', message: (error as Error).message });
     next();
   }
 });
