@@ -27,6 +27,26 @@ export const setAccessToken = async (linkAccountData: LinkAccountData) => {
   }
 };
 
+export const getAccessToken = async (itemId: string) => {
+  try {
+    const linkedAccount = await prisma.linkedAccount.findUnique({
+      where: {
+        item_id: itemId,
+      },
+      select: {
+        access_token: true,
+      },
+    });
+    if (!linkedAccount) {
+      console.error('No access token found for the given item ID');
+      return;
+    }
+    return linkedAccount.access_token;
+  } catch (error) {
+    console.error('Error getting access token:', error);
+  }
+};
+
 export const updateAliasAccountName = async (itemId: string, aliasAccountName: string) => {
   try {
     const res = await prisma.linkedAccount.update({

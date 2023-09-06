@@ -2,7 +2,7 @@ import express from 'express';
 import { CountryCode, Products, RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid';
 import { plaidClient } from '../config/plaid-config';
 import { UserInfoRequest } from '../utils/express-types';
-import { setAccessToken, updateAliasAccountName } from '../controller/plaid';
+import { getAccessToken, setAccessToken, updateAliasAccountName } from '../controller/plaid';
 
 const router = express.Router();
 let ACCESS_TOKEN = 'access-sandbox-565b0d29-b155-4bc7-b5fc-1275e050d721';
@@ -146,10 +146,17 @@ router.get('/transactions', async (request, response, next) => {
 
 // Remove the item associated with the access_token
 router.post('/item/remove', async (request: UserInfoRequest, response, next) => {
-  // const userId = request.userUid;
-  // FIXME - Get the access token from the DB
-  const accessToken = ACCESS_TOKEN;
+  const { itemId } = request.body;
   try {
+    // Get the access token
+    const accessToken = await getAccessToken(itemId);
+
+    if (!accessToken) {
+      return response.status(400).json({
+        message: 'Access token is not present for the given Item ID. Please try again',
+      });
+    }
+    // Remove the item from the Plaid API
     const removeItemResponse = await plaidClient.itemRemove({
       access_token: accessToken,
     });
