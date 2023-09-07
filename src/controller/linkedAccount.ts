@@ -7,6 +7,13 @@ type LinkAccountData = {
   institutionName: string;
 };
 
+type LinkedSubAccountData = {
+  accountId: string;
+  itemId: string;
+  name: string;
+  balance: number | null;
+};
+
 export const saveRecordToLinkedAccounts = async (linkAccountData: LinkAccountData) => {
   const { userUid, itemId, accessToken, institutionName } = linkAccountData;
 
@@ -24,6 +31,30 @@ export const saveRecordToLinkedAccounts = async (linkAccountData: LinkAccountDat
     return itemId;
   } catch (error) {
     console.error('Error adding linked account to database:', error);
+  }
+};
+
+export const saveRecordToLinkedSubAccounts = async (linkSubAccountData: LinkedSubAccountData[]) => {
+  const mapDataToLinkedSubAccounts = linkSubAccountData.map((item) => ({
+    account_id: item.accountId,
+    linked_account_item_id: item.itemId,
+    name: item.name,
+    balance: item.balance,
+  }));
+
+  try {
+    // Add the linked sub accounts to the database
+    const dbRes = await prisma.linkedSubAccount.createMany({
+      data: mapDataToLinkedSubAccounts,
+    });
+
+    if (dbRes.count === linkSubAccountData.length) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error adding linked account to database:', error);
+    return false;
   }
 };
 

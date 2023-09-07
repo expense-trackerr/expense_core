@@ -7,6 +7,7 @@ import {
   updateAliasAccountName,
   getAccessTokenFromItemId,
   saveRecordToLinkedAccounts,
+  saveRecordToLinkedSubAccounts,
 } from '../controller/linkedAccount';
 
 const router = express.Router();
@@ -66,12 +67,13 @@ router.post('/set_access_token', async (request: UserInfoRequest, response, next
       public_token: publicToken,
     });
 
-    // get the information about the item
-    const itemInfo = await plaidClient.itemGet({
+    // Get the accounts associated with the item
+    const accountsResponse = await plaidClient.accountsGet({
       access_token: tokenResponse.data.access_token,
     });
 
-    const institutionId = itemInfo.data.item.institution_id;
+    const itemId = accountsResponse.data.item.item_id;
+    const institutionId = accountsResponse.data.item.institution_id;
 
     if (!institutionId) {
       return response.status(500).json({
@@ -79,7 +81,7 @@ router.post('/set_access_token', async (request: UserInfoRequest, response, next
       });
     }
 
-    // get the institution details and get the name
+    // get the institution details and get the institution name
     const institutionInfo = await plaidClient.institutionsGetById({
       institution_id: institutionId,
       country_codes: PLAID_COUNTRY_CODES,
@@ -88,21 +90,37 @@ router.post('/set_access_token', async (request: UserInfoRequest, response, next
     const institutionName = institutionInfo.data.institution.name;
 
     // save the itemID, accessToken, institutionName in the database
-    const databaseResponse = await saveRecordToLinkedAccounts({
+    const savedLinkedAccountToDatabase = await saveRecordToLinkedAccounts({
       userUid,
-      itemId: tokenResponse.data.item_id,
+      itemId,
       accessToken: tokenResponse.data.access_token,
       institutionName,
     });
 
-    if (!databaseResponse) {
+    if (!savedLinkedAccountToDatabase) {
       return response.status(500).json({
         message: 'Unable to save the access token in the database. Please try again',
       });
     }
+
+    const mapSubAccountsResponse = accountsResponse.data.accounts.map((account) => ({
+      accountId: account.account_id,
+      name: account.name,
+      balance: account.balances.current,
+      itemId,
+    }));
+
+    const savedSubAccountsToDatabase = saveRecordToLinkedSubAccounts(mapSubAccountsResponse);
+
+    if (!savedSubAccountsToDatabase) {
+      return response.status(500).json({
+        message: 'Unable to save the sub accounts in the database. Please try again',
+      });
+    }
+
     // Send the database response to the client
     return response.status(201).json({
-      itemId: databaseResponse,
+      itemId,
     });
   } catch (error) {
     response
