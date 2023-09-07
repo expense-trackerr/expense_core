@@ -7,7 +7,7 @@ type LinkAccountData = {
   institutionName: string;
 };
 
-export const setAccessToken = async (linkAccountData: LinkAccountData) => {
+export const saveRecordToLinkedAccounts = async (linkAccountData: LinkAccountData) => {
   const { userUid, itemId, accessToken, institutionName } = linkAccountData;
 
   try {
@@ -27,7 +27,7 @@ export const setAccessToken = async (linkAccountData: LinkAccountData) => {
   }
 };
 
-export const getAccessToken = async (itemId: string) => {
+export const getAccessTokenFromItemId = async (itemId: string) => {
   try {
     const linkedAccount = await prisma.linkedAccount.findUnique({
       where: {
@@ -60,5 +60,19 @@ export const updateAliasAccountName = async (itemId: string, aliasAccountName: s
     return res.item_id;
   } catch (error) {
     console.error('Error updating alias account name:', error);
+  }
+};
+
+// Removes the item ID and all associated data from the database
+export const removeItemId = async (itemId: string) => {
+  try {
+    const res = await prisma.linkedAccount.delete({
+      where: {
+        item_id: itemId,
+      },
+    });
+    return res.item_id;
+  } catch (error) {
+    console.error(`Error deleting the item with item ID: ${itemId}`, error);
   }
 };

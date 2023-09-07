@@ -2,7 +2,12 @@ import express from 'express';
 import { CountryCode, Products, RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid';
 import { plaidClient } from '../config/plaid-config';
 import { UserInfoRequest } from '../utils/express-types';
-import { getAccessToken, setAccessToken, updateAliasAccountName } from '../controller/plaid';
+import {
+  removeItemId,
+  updateAliasAccountName,
+  getAccessTokenFromItemId,
+  saveRecordToLinkedAccounts,
+} from '../controller/linkedAccount';
 
 const router = express.Router();
 let ACCESS_TOKEN = 'access-sandbox-565b0d29-b155-4bc7-b5fc-1275e050d721';
@@ -82,8 +87,8 @@ router.post('/set_access_token', async (request: UserInfoRequest, response, next
 
     const institutionName = institutionInfo.data.institution.name;
 
-    // save the access token in the database
-    const databaseResponse = await setAccessToken({
+    // save the itemID, accessToken, institutionName in the database
+    const databaseResponse = await saveRecordToLinkedAccounts({
       userUid,
       itemId: tokenResponse.data.item_id,
       accessToken: tokenResponse.data.access_token,
@@ -125,7 +130,6 @@ router.get('/transactions', async (request, response, next) => {
         cursor: cursor,
       };
       const transactions = await plaidClient.transactionsSync(transactionsRequest);
-      console.log('transactions:', transactions);
       const data = transactions.data;
       // Add this page of results
       added = added.concat(data.added);
@@ -146,10 +150,10 @@ router.get('/transactions', async (request, response, next) => {
 
 // Remove the item associated with the access_token
 router.post('/item/remove', async (request: UserInfoRequest, response, next) => {
-  const { itemId } = request.body;
+  const { itemId }: { itemId: string } = request.body;
   try {
     // Get the access token
-    const accessToken = await getAccessToken(itemId);
+    const accessToken = await getAccessTokenFromItemId(itemId);
 
     if (!accessToken) {
       return response.status(400).json({
@@ -157,10 +161,15 @@ router.post('/item/remove', async (request: UserInfoRequest, response, next) => 
       });
     }
     // Remove the item from the Plaid API
-    const removeItemResponse = await plaidClient.itemRemove({
+    const removeItemResponse = plaidClient.itemRemove({
       access_token: accessToken,
     });
-    response.status(200).json(removeItemResponse.data);
+    // Remove the item from the database
+    const removeItemIdFromDB = removeItemId(itemId);
+
+    Promise.all([removeItemResponse, removeItemIdFromDB]);
+
+    response.status(200).json({ message: 'Item removed successfully' });
   } catch (error) {
     response.status(500).json({ error: 'Error removing the item', message: (error as Error).message });
     next();
