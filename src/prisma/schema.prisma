@@ -52,6 +52,8 @@ model LinkedSubAccount {
   updated_at             DateTime      @updatedAt
   linked_account         LinkedAccount @relation(fields: [linked_account_item_id], references: [item_id])
   linked_account_item_id String
+
+  @@map("linked_sub_account")
 }
 
 model CategoryType {
