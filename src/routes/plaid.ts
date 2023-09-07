@@ -9,6 +9,7 @@ import {
   saveRecordToLinkedAccounts,
   saveRecordToLinkedSubAccounts,
 } from '../controller/linkedAccount';
+import { Prisma } from '@prisma/client';
 
 const router = express.Router();
 let ACCESS_TOKEN = 'access-sandbox-565b0d29-b155-4bc7-b5fc-1275e050d721';
@@ -106,7 +107,7 @@ router.post('/set_access_token', async (request: UserInfoRequest, response, next
     const mapSubAccountsResponse = accountsResponse.data.accounts.map((account) => ({
       accountId: account.account_id,
       name: account.name,
-      balance: account.balances.current,
+      balance: account.balances.current ? new Prisma.Decimal(account.balances.current) : null,
       itemId,
     }));
 

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../config/database';
 
 type LinkAccountData = {
@@ -11,7 +12,7 @@ type LinkedSubAccountData = {
   accountId: string;
   itemId: string;
   name: string;
-  balance: number | null;
+  balance: Prisma.Decimal | null;
 };
 
 export const saveRecordToLinkedAccounts = async (linkAccountData: LinkAccountData) => {

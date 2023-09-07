@@ -29,16 +29,16 @@ model User {
 }
 
 model LinkedAccount {
-  item_id          String             @id
-  name             String
-  alias_name       String?
-  created_at       DateTime           @default(now())
-  updated_at       DateTime           @updatedAt
-  access_token     String             @unique
-  users            User               @relation(fields: [user_id], references: [id])
-  user_id          String
-  transactions     Transaction[]
-  LinkedSubAccount LinkedSubAccount[]
+  item_id             String             @id
+  name                String
+  alias_name          String?
+  created_at          DateTime           @default(now())
+  updated_at          DateTime           @updatedAt
+  access_token        String             @unique
+  users               User               @relation(fields: [user_id], references: [id])
+  user_id             String
+  transactions        Transaction[]
+  linked_sub_accounts LinkedSubAccount[]
 
   @@map("linked_account")
 }

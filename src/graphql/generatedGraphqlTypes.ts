@@ -25,8 +25,17 @@ export type Category = {
 export type LinkedAccount = {
   __typename?: 'LinkedAccount';
   alias_name?: Maybe<Scalars['String']['output']>;
-  created_at: Scalars['String']['output'];
   item_id: Scalars['String']['output'];
+  linked_sub_accounts: Array<LinkedSubAccount>;
+  name: Scalars['String']['output'];
+};
+
+export type LinkedSubAccount = {
+  __typename?: 'LinkedSubAccount';
+  account_id: Scalars['String']['output'];
+  alias_name?: Maybe<Scalars['String']['output']>;
+  balance?: Maybe<Scalars['Float']['output']>;
+  created_at: Scalars['String']['output'];
   name: Scalars['String']['output'];
 };
 
@@ -120,7 +129,9 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Category: ResolverTypeWrapper<Category>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   LinkedAccount: ResolverTypeWrapper<LinkedAccount>;
+  LinkedSubAccount: ResolverTypeWrapper<LinkedSubAccount>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
 }>;
@@ -129,7 +140,9 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   Category: Category;
+  Float: Scalars['Float']['output'];
   LinkedAccount: LinkedAccount;
+  LinkedSubAccount: LinkedSubAccount;
   Query: {};
   String: Scalars['String']['output'];
 }>;
@@ -142,8 +155,17 @@ export type CategoryResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type LinkedAccountResolvers<ContextType = any, ParentType extends ResolversParentTypes['LinkedAccount'] = ResolversParentTypes['LinkedAccount']> = ResolversObject<{
   alias_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  created_at?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   item_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  linked_sub_accounts?: Resolver<Array<ResolversTypes['LinkedSubAccount']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type LinkedSubAccountResolvers<ContextType = any, ParentType extends ResolversParentTypes['LinkedSubAccount'] = ResolversParentTypes['LinkedSubAccount']> = ResolversObject<{
+  account_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  alias_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  balance?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -156,6 +178,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 export type Resolvers<ContextType = any> = ResolversObject<{
   Category?: CategoryResolvers<ContextType>;
   LinkedAccount?: LinkedAccountResolvers<ContextType>;
+  LinkedSubAccount?: LinkedSubAccountResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 }>;
 
