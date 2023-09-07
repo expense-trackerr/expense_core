@@ -1,4 +1,5 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { Decimal } from '@prisma/client/runtime/library';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -9,11 +10,12 @@ export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' |
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
+  Decimal: { input: Decimal; output: Decimal };
 };
 
 export type Category = {
@@ -34,7 +36,7 @@ export type LinkedSubAccount = {
   __typename?: 'LinkedSubAccount';
   account_id: Scalars['String']['output'];
   alias_name?: Maybe<Scalars['String']['output']>;
-  balance?: Maybe<Scalars['Float']['output']>;
+  balance?: Maybe<Scalars['Decimal']['output']>;
   created_at: Scalars['String']['output'];
   name: Scalars['String']['output'];
 };
@@ -45,11 +47,9 @@ export type Query = {
   getLinkedAccounts: Array<LinkedAccount>;
 };
 
-
 export type QueryGetCategoriesArgs = {
   userId: Scalars['String']['input'];
 };
-
 
 export type QueryGetLinkedAccountsArgs = {
   userId: Scalars['String']['input'];
@@ -60,11 +60,12 @@ export type ResolversObject<TObject> = WithIndex<TObject>;
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
-
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
   resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
-export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> = ResolverFn<TResult, TParent, TContext, TArgs> | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
+  | ResolverFn<TResult, TParent, TContext, TArgs>
+  | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
@@ -111,7 +112,11 @@ export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
   info: GraphQLResolveInfo
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
-export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
+export type IsTypeOfResolverFn<T = {}, TContext = {}> = (
+  obj: T,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
@@ -123,13 +128,11 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
-
-
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Category: ResolverTypeWrapper<Category>;
-  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  Decimal: ResolverTypeWrapper<Scalars['Decimal']['output']>;
   LinkedAccount: ResolverTypeWrapper<LinkedAccount>;
   LinkedSubAccount: ResolverTypeWrapper<LinkedSubAccount>;
   Query: ResolverTypeWrapper<{}>;
@@ -140,20 +143,30 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   Category: Category;
-  Float: Scalars['Float']['output'];
+  Decimal: Scalars['Decimal']['output'];
   LinkedAccount: LinkedAccount;
   LinkedSubAccount: LinkedSubAccount;
   Query: {};
   String: Scalars['String']['output'];
 }>;
 
-export type CategoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = ResolversObject<{
+export type CategoryResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category'],
+> = ResolversObject<{
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type LinkedAccountResolvers<ContextType = any, ParentType extends ResolversParentTypes['LinkedAccount'] = ResolversParentTypes['LinkedAccount']> = ResolversObject<{
+export interface DecimalScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Decimal'], any> {
+  name: 'Decimal';
+}
+
+export type LinkedAccountResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['LinkedAccount'] = ResolversParentTypes['LinkedAccount'],
+> = ResolversObject<{
   alias_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   item_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   linked_sub_accounts?: Resolver<Array<ResolversTypes['LinkedSubAccount']>, ParentType, ContextType>;
@@ -161,24 +174,40 @@ export type LinkedAccountResolvers<ContextType = any, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type LinkedSubAccountResolvers<ContextType = any, ParentType extends ResolversParentTypes['LinkedSubAccount'] = ResolversParentTypes['LinkedSubAccount']> = ResolversObject<{
+export type LinkedSubAccountResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['LinkedSubAccount'] = ResolversParentTypes['LinkedSubAccount'],
+> = ResolversObject<{
   account_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   alias_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  balance?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  balance?: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
   created_at?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  getCategories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<QueryGetCategoriesArgs, 'userId'>>;
-  getLinkedAccounts?: Resolver<Array<ResolversTypes['LinkedAccount']>, ParentType, ContextType, RequireFields<QueryGetLinkedAccountsArgs, 'userId'>>;
+export type QueryResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
+> = ResolversObject<{
+  getCategories?: Resolver<
+    Array<ResolversTypes['Category']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetCategoriesArgs, 'userId'>
+  >;
+  getLinkedAccounts?: Resolver<
+    Array<ResolversTypes['LinkedAccount']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetLinkedAccountsArgs, 'userId'>
+  >;
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
   Category?: CategoryResolvers<ContextType>;
+  Decimal?: GraphQLScalarType;
   LinkedAccount?: LinkedAccountResolvers<ContextType>;
   LinkedSubAccount?: LinkedSubAccountResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 }>;
-

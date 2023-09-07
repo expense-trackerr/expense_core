@@ -2,6 +2,8 @@ const gql = String.raw;
 
 // GraphQL schema
 export const schema = gql`
+  scalar Decimal
+
   type Category {
     id: String!
     name: String
@@ -18,7 +20,7 @@ export const schema = gql`
     account_id: String!
     name: String!
     alias_name: String
-    balance: Float
+    balance: Decimal
     created_at: String!
   }
 
