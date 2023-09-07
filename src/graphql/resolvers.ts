@@ -16,6 +16,7 @@ export const resolvers: Resolvers = {
       });
       return categories;
     },
+    // Gets all linked accounts and sub accounts for a user
     getLinkedAccounts: async (_: any, args: QueryGetLinkedAccountsArgs) => {
       const userId = args.userId;
       const linkedAccounts = await prisma.linkedAccount.findMany({
