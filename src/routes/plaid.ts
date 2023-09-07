@@ -161,13 +161,11 @@ router.post('/item/remove', async (request: UserInfoRequest, response, next) => 
       });
     }
     // Remove the item from the Plaid API
-    const removeItemResponse = plaidClient.itemRemove({
+    await plaidClient.itemRemove({
       access_token: accessToken,
     });
     // Remove the item from the database
-    const removeItemIdFromDB = removeItemId(itemId);
-
-    Promise.all([removeItemResponse, removeItemIdFromDB]);
+    await removeItemId(itemId);
 
     response.status(200).json({ message: 'Item removed successfully' });
   } catch (error) {
@@ -193,6 +191,26 @@ router.put('/update_account_name', async (request: UserInfoRequest, response, ne
   } catch (error) {
     response.status(500).json({ error: 'Error updating the alias account name', message: (error as Error).message });
     next();
+  }
+});
+
+// Get the accounts associated with an Item
+router.post('/get-accounts', async function (request, response) {
+  const { itemId }: { itemId: string } = request.body;
+  try {
+    // Get the access token
+    const accessToken = await getAccessTokenFromItemId(itemId);
+    if (!accessToken) {
+      return response.status(400).json({
+        message: 'Access token is not present for the given Item ID. Please try again',
+      });
+    }
+    const accountsResponse = await plaidClient.accountsGet({
+      access_token: accessToken,
+    });
+    response.status(200).json(accountsResponse.data);
+  } catch (error) {
+    return response.status(500).json({ error: 'Error getting the accounts', message: (error as Error).message });
   }
 });
 
