@@ -29,17 +29,29 @@ model User {
 }
 
 model LinkedAccount {
-  item_id      String        @id
-  name         String
-  alias_name   String?
-  created_at   DateTime      @default(now())
-  updated_at   DateTime      @updatedAt
-  access_token String        @unique
-  users        User          @relation(fields: [user_id], references: [id])
-  user_id      String
-  transactions Transaction[]
+  item_id          String             @id
+  name             String
+  alias_name       String?
+  created_at       DateTime           @default(now())
+  updated_at       DateTime           @updatedAt
+  access_token     String             @unique
+  users            User               @relation(fields: [user_id], references: [id])
+  user_id          String
+  transactions     Transaction[]
+  LinkedSubAccount LinkedSubAccount[]
 
   @@map("linked_account")
+}
+
+model LinkedSubAccount {
+  account_id             String        @id
+  name                   String
+  alias_name             String?
+  balance                Decimal       @db.Decimal(10, 2)
+  created_at             DateTime      @default(now())
+  updated_at             DateTime      @updatedAt
+  linked_account         LinkedAccount @relation(fields: [linked_account_item_id], references: [item_id])
+  linked_account_item_id String
 }
 
 model CategoryType {
