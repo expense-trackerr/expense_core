@@ -27,13 +27,13 @@ export const resolvers: Resolvers = {
           alias_name: true,
           item_id: true,
           name: true,
+          created_at: true,
           linked_sub_accounts: {
             select: {
               account_id: true,
               balance: true,
               name: true,
               alias_name: true,
-              created_at: true,
             },
           },
         },
@@ -41,10 +41,7 @@ export const resolvers: Resolvers = {
       const linkedAccountsWithStringDate = linkedAccounts.map((linkedAccount) => {
         return {
           ...linkedAccount,
-          linked_sub_accounts: linkedAccount.linked_sub_accounts.map((linkedSubAccount) => ({
-            ...linkedSubAccount,
-            created_at: linkedSubAccount.created_at.toISOString(),
-          })),
+          created_at: linkedAccount.created_at.toISOString(),
         };
       });
 

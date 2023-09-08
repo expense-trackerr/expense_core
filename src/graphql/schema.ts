@@ -13,6 +13,7 @@ export const schema = gql`
     item_id: String!
     name: String!
     alias_name: String
+    created_at: String!
     linked_sub_accounts: [LinkedSubAccount!]!
   }
 
@@ -21,7 +22,6 @@ export const schema = gql`
     name: String!
     alias_name: String
     balance: Decimal
-    created_at: String!
   }
 
   type Query {
