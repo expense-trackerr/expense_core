@@ -50,7 +50,7 @@ model LinkedSubAccount {
   balance                Decimal?      @db.Decimal(10, 2)
   created_at             DateTime      @default(now())
   updated_at             DateTime      @updatedAt
-  linked_account         LinkedAccount @relation(fields: [linked_account_item_id], references: [item_id])
+  linked_account         LinkedAccount @relation(fields: [linked_account_item_id], references: [item_id], onDelete: Cascade)
   linked_account_item_id String
 
   @@map("linked_sub_account")
