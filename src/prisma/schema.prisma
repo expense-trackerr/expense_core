@@ -66,17 +66,30 @@ model CategoryType {
   @@map("category_type")
 }
 
+model CategoryColor {
+  id         String     @id @default(uuid())
+  name       String
+  hex_code   String
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  Category   Category[]
+
+  @@map("category_color")
+}
+
 model Category {
-  id               String        @id @default(uuid())
-  name             String
-  budget           Decimal?      @db.Decimal(10, 2)
-  created_at       DateTime      @default(now())
-  updated_at       DateTime      @updatedAt
-  User             User          @relation(fields: [user_id], references: [id])
-  user_id          String
-  transactions     Transaction[]
-  category_type    CategoryType  @relation(fields: [category_type_id], references: [id])
-  category_type_id String
+  id                String        @id @default(uuid())
+  name              String
+  budget            Decimal?      @db.Decimal(10, 2)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  User              User          @relation(fields: [user_id], references: [id])
+  user_id           String
+  transactions      Transaction[]
+  category_type     CategoryType  @relation(fields: [category_type_id], references: [id])
+  category_type_id  String
+  category_color    CategoryColor @relation(fields: [category_color_id], references: [id])
+  category_color_id String
 
   @@map("category")
 }
