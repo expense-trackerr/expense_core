@@ -1,18 +1,22 @@
 import { PrismaClient } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.categoryType.create({
-    data: {
-      name: 'Expense',
-    },
-  });
+  const categoryTypes = await prisma.categoryType.findMany();
 
-  await prisma.categoryType.create({
-    data: {
-      name: 'Income',
-    },
-  });
+  if (categoryTypes.length === 0) {
+    await prisma.categoryType.createMany({
+      data: [
+        {
+          name: 'Income',
+        },
+        {
+          name: 'Expense',
+        },
+      ],
+    });
+  }
 }
 
 main()

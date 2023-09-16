@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "./src/index.ts",
+  "prisma": {
+    "seed": "ts-node ./prisma/seed.ts"
+  },
   "scripts": {
     "dev": "nodemon ./src/index.ts",
     "start": "node src/index.ts",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "codegen": "graphql-codegen --config ./src/graphql/codegen.ts",
-    "prettier": "prettier --write --config prettierrc.json \"src/**/*.{js,jsx,ts,tsx,json}\" ",
-    "prisma-seed": "ts-node ./src/prisma/seed.ts"
+    "prettier": "prettier --write --config prettierrc.json \"src/**/*.{js,jsx,ts,tsx,json}\" "
   },
   "author": "",
   "license": "ISC",
