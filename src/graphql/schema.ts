@@ -9,6 +9,12 @@ export const schema = gql`
     name: String
   }
 
+  type CategoryColor {
+    id: String!
+    name: String!
+    hex_code: String!
+  }
+
   type LinkedAccount {
     item_id: String!
     name: String!
@@ -25,6 +31,7 @@ export const schema = gql`
   }
 
   type Query {
+    getCategoryColors: [CategoryColor!]!
     getCategories(userId: String!): [Category!]!
     getLinkedAccounts(userId: String!): [LinkedAccount!]!
   }

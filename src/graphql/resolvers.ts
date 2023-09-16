@@ -3,6 +3,16 @@ import { QueryGetCategoriesArgs, Resolvers, QueryGetLinkedAccountsArgs } from '.
 
 export const resolvers: Resolvers = {
   Query: {
+    getCategoryColors: async () => {
+      const categoryColors = await prisma.categoryColor.findMany({
+        select: {
+          id: true,
+          name: true,
+          hex_code: true,
+        },
+      });
+      return categoryColors;
+    },
     getCategories: async (_: any, args: QueryGetCategoriesArgs) => {
       const userId = args.userId;
       const categories = await prisma.category.findMany({
