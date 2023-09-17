@@ -56,7 +56,7 @@ export const createCategory = async (userId: string, categoryPayload: CategoryPa
         user_id: userId,
         category_type_id: categoryTypeId.id,
         name: categoryName,
-        budget: categoryBudget,
+        budget: categoryType === CategoryTypeName.Expense ? categoryBudget : null,
         category_color_id: categoryColorId,
       },
     });
