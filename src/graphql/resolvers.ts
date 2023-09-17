@@ -25,6 +25,7 @@ export const resolvers: Resolvers = {
           id: true,
           name: true,
           budget: true,
+          deleted: true,
           category_type: {
             select: {
               name: true,
@@ -38,7 +39,10 @@ export const resolvers: Resolvers = {
         },
       });
 
-      return categories.map((category) => ({
+      // Filter out deleted categories
+      const filteredCategories = categories.filter((category) => !category.deleted);
+
+      return filteredCategories.map((category) => ({
         ...category,
         category_type: category.category_type.name,
         category_color: category.category_color.hex_code,
