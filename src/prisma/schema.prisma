@@ -83,6 +83,7 @@ model Category {
   budget            Decimal?      @db.Decimal(10, 2)
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
+  deleted           Boolean       @default(false) // Set to true when user deletes category; but keeps transactions
   User              User          @relation(fields: [user_id], references: [id])
   user_id           String
   transactions      Transaction[]
@@ -101,7 +102,7 @@ model Transaction {
   amount                 Decimal        @db.Decimal(10, 2)
   created_at             DateTime       @default(now())
   updated_at             DateTime       @updatedAt
-  category               Category?      @relation(fields: [category_id], references: [id])
+  category               Category?      @relation(fields: [category_id], references: [id], onDelete: Restrict)
   category_id            String?
   User                   User           @relation(fields: [user_id], references: [id])
   user_id                String
