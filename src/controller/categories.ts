@@ -20,6 +20,7 @@ export const checkCategoryNameExists = async (userId: string, categoryName: stri
       where: {
         user_id: userId,
         name: categoryName,
+        deleted: false,
       },
     });
     if (res === null) {
