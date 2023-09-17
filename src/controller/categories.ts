@@ -85,7 +85,7 @@ export const deleteCategory = async (userId: string, categoryDeletePayload: Cate
         },
       });
 
-      // Delete the category
+      // Then delete the category
       await prisma.category.delete({
         where: {
           id: categoryId,
@@ -94,7 +94,7 @@ export const deleteCategory = async (userId: string, categoryDeletePayload: Cate
       });
     }
 
-    // If deleteTransactions is false,Set the deleted flag to true in Category table
+    // If deleteTransactions is false, Set the deleted flag to true in Category table
     else {
       await prisma.category.update({
         where: {
