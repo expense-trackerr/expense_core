@@ -19,8 +19,13 @@
     "semi": ["error", "always"],
     "@typescript-eslint/comma-dangle": "off",
     "import/no-extraneous-dependencies": ["off"],
-    "no-unused-vars": "warn",
     "import/named": "off",
-    "@typescript-eslint/brace-style": "off"
+    "@typescript-eslint/brace-style": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_" // ignore unused function arguments whose name starts with _
+      }
+    ]
   }
 }

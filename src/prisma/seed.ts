@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { CategoryTypeName, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -10,10 +10,10 @@ async function main() {
     await prisma.categoryType.createMany({
       data: [
         {
-          name: 'Income',
+          name: CategoryTypeName.Income,
         },
         {
-          name: 'Expense',
+          name: CategoryTypeName.Expense,
         },
       ],
     });
