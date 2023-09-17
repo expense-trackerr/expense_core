@@ -1,76 +1,61 @@
 import express from 'express';
 import { UserInfoRequest } from '../utils/express-types';
 import db from '../config/database';
+import { CategoryTypeName } from '@prisma/client';
+import { checkCategoryNameExists, createCategory } from '../controller/categories';
 
 const router = express.Router();
 
-//DB
+type CreateCategoryReqBody = {
+  categoryType: CategoryTypeName;
+  categoryName: string;
+  categoryBudget?: number;
+  categoryColorId: string;
+};
+
 // Creates entries in the categories table
 router.post('/create', async (req: UserInfoRequest, res) => {
-  const { categories }: { categories: string[] } = req.body;
+  const { categoryName, categoryType, categoryBudget, categoryColorId }: CreateCategoryReqBody = req.body;
   const userUid = req.userUid;
+
   try {
     if (!userUid) {
       return res.status(400).json({
         message: 'User ID is not present. Ensure that you are logged in to the application',
       });
     }
-    // Categories cannot be empty
-    if (!categories || categories.length === 0 || categories.some((category) => !category.trim())) {
-      return res.status(400).json({ message: 'Categories cannot be empty' });
-    }
 
-    // Unique categories validation
-    const duplicateCategories = await Promise.all(
-      categories.map((category) => {
-        return db.query('SELECT name FROM categories WHERE name = ? AND user_uid = ?', [category, userUid]);
-      })
-    );
-
-    const duplicateCategoryNames = duplicateCategories
-      // @ts-ignore: Will resolve it later
-      .map((result) => result[0][0]?.name)
-      .filter((name) => name !== undefined);
-
-    if (duplicateCategoryNames.length > 0) {
+    // Category name and type and color cannot be empty
+    if (!categoryName || !categoryType || !categoryColorId) {
       return res.status(400).json({
-        message: `${duplicateCategoryNames[0]} already exists`,
+        message: 'Category name, category type, and category color are required',
       });
     }
 
-    const insertPromises = categories.map((category) => {
-      return db.query('INSERT INTO categories (name, user_uid) VALUES (?, ?)', [category, userUid]);
+    // Cannot have duplicatate category names
+    const categoryNameExists = await checkCategoryNameExists(userUid, categoryName);
+    if (categoryNameExists) {
+      return res.status(400).json({
+        message: 'Category name already exists',
+      });
+    }
+
+    // Create the category
+    const createCategoryPayload = {
+      categoryType,
+      categoryName,
+      categoryBudget,
+      categoryColorId,
+    };
+    const createdCategoryId = await createCategory(userUid, createCategoryPayload);
+
+    res.status(201).json({
+      message: 'Category created successfully',
+      data: createdCategoryId,
     });
-    await Promise.all(insertPromises);
-    res.status(201).json({ message: 'Category created successfully' });
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-  }
-});
-
-// DB
-// Deletes entries in the categories table
-router.post('/delete', async (req: UserInfoRequest, res) => {
-  const { categoriesId }: { categoriesId: number | number[] } = req.body;
-  const userUid = req.userUid;
-  try {
-    if (!categoriesId) {
-      return res.status(400).json({ message: 'Category ID is not present' });
-    }
-    // Deleting one cateogry
-    if (typeof categoriesId === 'number') {
-      await db.query('DELETE FROM categories WHERE id = ? AND user_uid = ?', [categoriesId, userUid]);
-    }
-    // Deleting multiple categories
-    else {
-      const deletePromises = categoriesId.map((id) => {
-        return db.query('DELETE FROM categories WHERE id = ? AND user_uid = ?', [id, userUid]);
-      });
-      await Promise.all(deletePromises);
-    }
-    res.status(200).json({ message: 'Category deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    console.error('Error creating category:', error);
+    res.status(500).json({ error: 'Error creating category', message: (error as Error).message });
   }
 });
 
