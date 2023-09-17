@@ -13,6 +13,8 @@ export const resolvers: Resolvers = {
       });
       return categoryColors;
     },
+
+    // Gets al the categories for a user
     getCategories: async (_: any, args: QueryGetCategoriesArgs) => {
       const userId = args.userId;
       const categories = await prisma.category.findMany({
@@ -22,10 +24,27 @@ export const resolvers: Resolvers = {
         select: {
           id: true,
           name: true,
+          budget: true,
+          category_type: {
+            select: {
+              name: true,
+            },
+          },
+          category_color: {
+            select: {
+              hex_code: true,
+            },
+          },
         },
       });
-      return categories;
+
+      return categories.map((category) => ({
+        ...category,
+        category_type: category.category_type.name,
+        category_color: category.category_color.hex_code,
+      }));
     },
+
     // Gets all linked accounts and sub accounts for a user
     getLinkedAccounts: async (_: any, args: QueryGetLinkedAccountsArgs) => {
       const userId = args.userId;

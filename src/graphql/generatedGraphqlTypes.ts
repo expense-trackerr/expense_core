@@ -20,8 +20,11 @@ export type Scalars = {
 
 export type Category = {
   __typename?: 'Category';
+  budget?: Maybe<Scalars['Decimal']['output']>;
+  category_color: Scalars['String']['output'];
+  category_type: Scalars['String']['output'];
   id: Scalars['String']['output'];
-  name?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
 };
 
 export type CategoryColor = {
@@ -160,8 +163,11 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type CategoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = ResolversObject<{
+  budget?: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
+  category_color?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  category_type?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

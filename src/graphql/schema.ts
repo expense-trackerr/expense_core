@@ -6,7 +6,10 @@ export const schema = gql`
 
   type Category {
     id: String!
-    name: String
+    name: String!
+    budget: Decimal
+    category_type: String!
+    category_color: String!
   }
 
   type CategoryColor {
