@@ -8,6 +8,11 @@ type CategoryPayload = {
   categoryColorId: string;
 };
 
+type CategoryDeletePayload = {
+  categoryId: string;
+  deleteTransactions: boolean;
+};
+
 // Checks if a category name exists for a user
 export const checkCategoryNameExists = async (userId: string, categoryName: string) => {
   try {
@@ -64,5 +69,45 @@ export const createCategory = async (userId: string, categoryPayload: CategoryPa
   } catch (error) {
     console.error('Error creating category:', error);
     throw new Error('Error creating category' + error);
+  }
+};
+
+export const deleteCategory = async (userId: string, categoryDeletePayload: CategoryDeletePayload) => {
+  const { categoryId, deleteTransactions } = categoryDeletePayload;
+
+  try {
+    // If deleteTransactions is true, delete all transactions associated with the category
+    if (deleteTransactions) {
+      await prisma.transaction.deleteMany({
+        where: {
+          category_id: categoryId,
+          user_id: userId,
+        },
+      });
+
+      // Delete the category
+      await prisma.category.delete({
+        where: {
+          id: categoryId,
+          user_id: userId,
+        },
+      });
+    }
+
+    // If deleteTransactions is false,Set the deleted flag to true in Category table
+    else {
+      await prisma.category.update({
+        where: {
+          id: categoryId,
+          user_id: userId,
+        },
+        data: {
+          deleted: true,
+        },
+      });
+    }
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    throw new Error('Error deleting category' + error);
   }
 };
