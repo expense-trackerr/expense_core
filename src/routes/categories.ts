@@ -1,8 +1,7 @@
-import express from 'express';
-import { UserInfoRequest } from '../utils/express-types';
-import db from '../config/database';
 import { CategoryTypeName } from '@prisma/client';
+import express from 'express';
 import { checkCategoryNameExists, createCategory } from '../controller/categories';
+import { UserInfoRequest } from '../utils/express-types';
 
 const router = express.Router();
 
