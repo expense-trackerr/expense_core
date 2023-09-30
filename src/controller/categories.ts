@@ -1,7 +1,7 @@
 import { CategoryTypeName } from '@prisma/client';
 import { prisma } from '../config/database';
 
-type CategoryPayload = {
+type CategoryCreatePayload = {
   categoryType: CategoryTypeName;
   categoryName: string;
   categoryBudget?: number;
@@ -11,6 +11,14 @@ type CategoryPayload = {
 type CategoryDeletePayload = {
   categoryId: string;
   deleteTransactions: boolean;
+};
+
+type CategoryUpdatePayload = {
+  categoryId: string;
+  categoryType: CategoryTypeName;
+  categoryName?: string;
+  categoryBudget?: number;
+  categoryColorId?: string;
 };
 
 // Checks if a category name exists for a user
@@ -33,7 +41,7 @@ export const checkCategoryNameExists = async (userId: string, categoryName: stri
   }
 };
 
-export const createCategory = async (userId: string, categoryPayload: CategoryPayload) => {
+export const createCategory = async (userId: string, categoryPayload: CategoryCreatePayload) => {
   const { categoryType, categoryName, categoryBudget, categoryColorId } = categoryPayload;
 
   try {
@@ -70,6 +78,29 @@ export const createCategory = async (userId: string, categoryPayload: CategoryPa
   } catch (error) {
     console.error('Error creating category:', error);
     throw new Error('Error creating category' + error);
+  }
+};
+
+export const updateCategory = async (userId: string, categoryUpdatePayload: CategoryUpdatePayload) => {
+  const { categoryId, categoryType, categoryName, categoryBudget, categoryColorId } = categoryUpdatePayload;
+
+  const dataToUpdate = {
+    ...(categoryName && { name: categoryName }),
+    ...(categoryBudget && { budget: categoryType === CategoryTypeName.Expense ? categoryBudget : undefined }),
+    ...(categoryColorId && { category_color_id: categoryColorId }),
+  };
+
+  try {
+    await prisma.category.update({
+      where: {
+        id: categoryId,
+        user_id: userId,
+      },
+      data: dataToUpdate,
+    });
+  } catch (error) {
+    console.error('Error updating category:', error);
+    throw new Error('Error updating category' + error);
   }
 };
 
