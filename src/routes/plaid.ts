@@ -132,8 +132,24 @@ router.post('/set_access_token', async (request: UserInfoRequest, response, next
 });
 
 // Retrieve Transactions for an Item
-router.get('/transactions', async (request, response, next) => {
+router.get('/transactions/:item_id', async (request: UserInfoRequest, response, next) => {
+  const { item_id: itemId } = request.params;
+  const userUid = request.userUid;
   try {
+    // If user ID is not preset, return an error
+    if (!userUid) {
+      return response.status(400).json({
+        message: 'User ID is not present. Ensure that you are logged in to the application',
+      });
+    }
+    // Get the access token
+    const accessToken = await getAccessTokenFromItemId(itemId, userUid);
+    if (!accessToken) {
+      return response.status(400).json({
+        message: 'Access token is not present for the given Item ID. Please try again',
+      });
+    }
+
     let cursor = undefined;
 
     // New transaction updates since "cursor"
@@ -145,7 +161,7 @@ router.get('/transactions', async (request, response, next) => {
     // Iterate through each page of new transaction updates for item
     while (hasMore) {
       const transactionsRequest: TransactionsSyncRequest = {
-        access_token: ACCESS_TOKEN,
+        access_token: accessToken,
         cursor: cursor,
       };
       const transactions = await plaidClient.transactionsSync(transactionsRequest);
@@ -159,8 +175,8 @@ router.get('/transactions', async (request, response, next) => {
       cursor = data.next_cursor;
     }
 
-    const recentlyAdded = [...added].sort(compareTxnsByDateAscending);
-    response.json({ latest_transactions: recentlyAdded });
+    // const recentlyAdded = [...added].sort(compareTxnsByDateAscending);
+    response.json({ added, modified, removed });
   } catch (error) {
     console.error('Error getting transactions:', error);
     next();
