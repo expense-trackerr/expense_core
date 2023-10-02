@@ -35,6 +35,7 @@ model LinkedAccount {
   created_at          DateTime           @default(now())
   updated_at          DateTime           @updatedAt
   access_token        String             @unique
+  last_cursor         String?
   users               User               @relation(fields: [user_id], references: [id])
   user_id             String
   transactions        Transaction[]
