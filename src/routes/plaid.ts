@@ -1,15 +1,22 @@
+import { Prisma } from '@prisma/client';
 import express from 'express';
 import { CountryCode, Products, RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid';
 import { plaidClient } from '../config/plaid-config';
-import { UserInfoRequest } from '../utils/express-types';
 import {
-  removeItemId,
-  updateAliasAccountName,
   getAccessTokenFromItemId,
+  removeItemId,
   saveRecordToLinkedAccounts,
   saveRecordToLinkedSubAccounts,
+  updateAliasAccountName,
 } from '../controller/linkedAccount';
-import { Prisma } from '@prisma/client';
+import { UserInfoRequest } from '../utils/express-types';
+
+type TransactionsAllData = {
+  added: Transaction[];
+  modified: Transaction[];
+  removed: RemovedTransaction[];
+  nextCursor: string | undefined;
+};
 
 const router = express.Router();
 let ACCESS_TOKEN = 'access-sandbox-565b0d29-b155-4bc7-b5fc-1275e050d721';
@@ -150,33 +157,33 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
       });
     }
 
-    let cursor = undefined;
+    const allData: TransactionsAllData = {
+      added: [],
+      modified: [],
+      removed: [],
+      nextCursor: undefined,
+    };
 
-    // New transaction updates since "cursor"
-    let added: Transaction[] = [];
-    let modified: Transaction[] = [];
-    // Removed transaction ids
-    let removed: RemovedTransaction[] = [];
     let hasMore = true;
     // Iterate through each page of new transaction updates for item
     while (hasMore) {
       const transactionsRequest: TransactionsSyncRequest = {
         access_token: accessToken,
-        cursor: cursor,
+        cursor: allData.nextCursor,
       };
       const transactions = await plaidClient.transactionsSync(transactionsRequest);
-      const data = transactions.data;
+      const newData = transactions.data;
       // Add this page of results
-      added = added.concat(data.added);
-      modified = modified.concat(data.modified);
-      removed = removed.concat(data.removed);
-      hasMore = data.has_more;
+      allData.added = allData.added.concat(newData.added);
+      allData.modified = allData.modified.concat(newData.modified);
+      allData.removed = allData.removed.concat(newData.removed);
+      hasMore = newData.has_more;
       // Update cursor to the next cursor
-      cursor = data.next_cursor;
+      allData.nextCursor = newData.next_cursor;
     }
 
     // const recentlyAdded = [...added].sort(compareTxnsByDateAscending);
-    response.json({ added, modified, removed });
+    response.json(allData);
   } catch (error) {
     console.error('Error getting transactions:', error);
     next();
