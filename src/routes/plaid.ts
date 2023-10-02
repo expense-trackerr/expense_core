@@ -170,9 +170,15 @@ router.get('/transactions', async (request, response, next) => {
 // Remove the item associated with the access_token
 router.post('/item/remove', async (request: UserInfoRequest, response, next) => {
   const { itemId }: { itemId: string } = request.body;
+  const userUid = request.userUid;
   try {
+    if (!userUid) {
+      return response.status(400).json({
+        message: 'User ID is not present. Ensure that you are logged in to the application',
+      });
+    }
     // Get the access token
-    const accessToken = await getAccessTokenFromItemId(itemId);
+    const accessToken = await getAccessTokenFromItemId(itemId, userUid);
 
     if (!accessToken) {
       return response.status(400).json({
@@ -196,13 +202,22 @@ router.post('/item/remove', async (request: UserInfoRequest, response, next) => 
 // Updates the Alias Account Name for an Item
 router.put('/update_account_name', async (request: UserInfoRequest, response, next) => {
   const { accountName: newAccountName, itemId } = request.body;
+  const userUid = request.userUid;
+
+  // If user ID is not preset, return an error
+  if (!userUid) {
+    return response.status(400).json({
+      message: 'User ID is not present. Ensure that you are logged in to the application',
+    });
+  }
+
   if (!newAccountName || !itemId) {
     return response.status(400).json({
       message: 'Account name or item ID is not present. Please try again',
     });
   }
   try {
-    const resItemId = updateAliasAccountName(itemId, newAccountName);
+    const resItemId = updateAliasAccountName(itemId, userUid, newAccountName);
     response.status(200).json({
       message: 'Account name updated successfully',
       itemId: resItemId,
