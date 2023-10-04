@@ -6,12 +6,43 @@ import { getAccessTokenAndCursorFromItemId } from '../../controller/linkedAccoun
 import { UserInfoRequest } from '../../utils/express-types';
 
 const router = express.Router();
+export const DEFAULT_CURRENCY = 'CAD';
 
 type TransactionsAllData = {
   added: Transaction[];
   modified: Transaction[];
   removed: RemovedTransaction[];
   nextCursor: string | undefined;
+};
+
+export type SimpleTransaction = ReturnType<typeof getSimpleTransactionObject>;
+
+// Extracts the necessary fields from a transaction object
+const getSimpleTransactionObject = (transaction: Transaction, userId: string) => {
+  const {
+    transaction_id,
+    account_id,
+    iso_currency_code,
+    amount,
+    merchant_name,
+    name,
+    authorized_date,
+    date,
+    pending,
+    pending_transaction_id,
+  } = transaction;
+
+  return {
+    userId,
+    transactionId: transaction_id,
+    accountId: account_id,
+    currencyCode: iso_currency_code ?? DEFAULT_CURRENCY,
+    amount,
+    name: merchant_name ?? name,
+    date: authorized_date ?? date,
+    pending,
+    pendingTransactionId: pending_transaction_id,
+  };
 };
 
 // Fetch all transactions data for an item
@@ -56,33 +87,6 @@ const fetchTransactionsData = async (
   }
 };
 
-// Extracts the necessary fields from a transaction object
-const getSimpleTransactionObject = (transaction: Transaction) => {
-  const {
-    transaction_id,
-    account_id,
-    iso_currency_code,
-    amount,
-    merchant_name,
-    name,
-    authorized_date,
-    date,
-    pending,
-    pending_transaction_id,
-  } = transaction;
-
-  return {
-    transactionId: transaction_id,
-    accountId: account_id,
-    isoCurrencyCode: iso_currency_code,
-    amount,
-    name: merchant_name ?? name,
-    date: authorized_date ?? date,
-    pending,
-    pendingTransactionId: pending_transaction_id,
-  };
-};
-
 // Retrieve Transactions for an Item
 router.get('/transactions/:item_id', async (request: UserInfoRequest, response, next) => {
   const { item_id: itemId } = request.params;
@@ -108,6 +112,12 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
     }
 
     const allData = await fetchTransactionsData(itemInfo.access_token, itemInfo.last_cursor);
+
+    const simpleTransactions = allData.added.map((transaction) => getSimpleTransactionObject(transaction, userUid));
+    const modifiedTransactions = allData.modified.map((transaction) =>
+      getSimpleTransactionObject(transaction, userUid)
+    );
+
     return response.status(200).json(allData);
   } catch (error) {
     console.error('Error getting transactions:', error);
