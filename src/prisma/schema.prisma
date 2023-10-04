@@ -38,7 +38,6 @@ model LinkedAccount {
   last_cursor         String?
   users               User               @relation(fields: [user_id], references: [id])
   user_id             String
-  transactions        Transaction[]
   linked_sub_accounts LinkedSubAccount[]
 
   @@map("linked_account")
@@ -53,6 +52,7 @@ model LinkedSubAccount {
   updated_at             DateTime      @updatedAt
   linked_account         LinkedAccount @relation(fields: [linked_account_item_id], references: [item_id], onDelete: Cascade)
   linked_account_item_id String
+  transactions           Transaction[]
 
   @@map("linked_sub_account")
 }
@@ -97,20 +97,20 @@ model Category {
 }
 
 model Transaction {
-  id                     String         @id
-  date                   DateTime
-  name                   String
-  amount                 Decimal        @db.Decimal(10, 2)
-  pending                Boolean        @default(false)
-  currency               String         @default("CAD")
-  created_at             DateTime       @default(now())
-  updated_at             DateTime       @updatedAt
-  category               Category?      @relation(fields: [category_id], references: [id], onDelete: Restrict)
-  category_id            String?
-  User                   User           @relation(fields: [user_id], references: [id])
-  user_id                String
-  linked_account         LinkedAccount? @relation(fields: [linked_account_item_id], references: [item_id])
-  linked_account_item_id String?
+  id                    String            @id
+  date                  DateTime
+  name                  String
+  amount                Decimal           @db.Decimal(10, 2)
+  pending               Boolean           @default(false)
+  currency              String            @default("CAD")
+  created_at            DateTime          @default(now())
+  updated_at            DateTime          @updatedAt
+  category              Category?         @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  category_id           String?
+  User                  User              @relation(fields: [user_id], references: [id])
+  user_id               String
+  linked_account        LinkedSubAccount? @relation(fields: [linked_sub_account_id], references: [account_id])
+  linked_sub_account_id String?
 
   @@map("transaction")
 }
