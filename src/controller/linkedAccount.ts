@@ -61,7 +61,7 @@ export const saveRecordToLinkedSubAccounts = async (linkSubAccountData: LinkedSu
 
 // Question: How to throw an error here that is caught by the catch block in the route?
 // Additionally, put the logic for checking !linkedAccount in here
-export const getAccessTokenFromItemId = async (itemId: string, userUid: string) => {
+export const getAccessTokenAndCursorFromItemId = async (itemId: string, userUid: string) => {
   try {
     const linkedAccount = await prisma.linkedAccount.findUnique({
       where: {
@@ -70,13 +70,14 @@ export const getAccessTokenFromItemId = async (itemId: string, userUid: string) 
       },
       select: {
         access_token: true,
+        last_cursor: true,
       },
     });
     if (!linkedAccount) {
-      console.error('No access token found for the given item ID');
+      console.error('No linked account found for the given item ID');
       return;
     }
-    return linkedAccount.access_token;
+    return linkedAccount;
   } catch (error) {
     console.error('Error getting access token:', error);
   }

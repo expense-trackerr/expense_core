@@ -3,7 +3,7 @@ import express from 'express';
 import { CountryCode, Products, RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid';
 import { plaidClient } from '../config/plaid-config';
 import {
-  getAccessTokenFromItemId,
+  getAccessTokenAndCursorFromItemId,
   removeItemId,
   saveRecordToLinkedAccounts,
   saveRecordToLinkedSubAccounts,
@@ -150,8 +150,13 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
       });
     }
     // Get the access token
-    const accessToken = await getAccessTokenFromItemId(itemId, userUid);
-    if (!accessToken) {
+    const itemInfo = await getAccessTokenAndCursorFromItemId(itemId, userUid);
+    if (!itemInfo) {
+      return response.status(400).json({
+        message: 'No linked account found for the given item ID',
+      });
+    }
+    if (!itemInfo.access_token) {
       return response.status(400).json({
         message: 'Access token is not present for the given Item ID. Please try again',
       });
@@ -168,12 +173,12 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
     // Iterate through each page of new transaction updates for item
     while (hasMore) {
       const transactionsRequest: TransactionsSyncRequest = {
-        access_token: accessToken,
+        access_token: itemInfo.access_token,
         cursor: allData.nextCursor,
       };
       const transactions = await plaidClient.transactionsSync(transactionsRequest);
       const newData = transactions.data;
-      // Add this page of results
+
       allData.added = allData.added.concat(newData.added);
       allData.modified = allData.modified.concat(newData.modified);
       allData.removed = allData.removed.concat(newData.removed);
@@ -183,7 +188,7 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
     }
 
     // const recentlyAdded = [...added].sort(compareTxnsByDateAscending);
-    response.json(allData);
+    return response.status(200).json(allData);
   } catch (error) {
     console.error('Error getting transactions:', error);
     next();
@@ -201,16 +206,21 @@ router.post('/item/remove', async (request: UserInfoRequest, response, next) => 
       });
     }
     // Get the access token
-    const accessToken = await getAccessTokenFromItemId(itemId, userUid);
+    const itemInfo = await getAccessTokenAndCursorFromItemId(itemId, userUid);
+    if (!itemInfo) {
+      return response.status(400).json({
+        message: 'No linked account found for the given item ID',
+      });
+    }
 
-    if (!accessToken) {
+    if (!itemInfo.access_token) {
       return response.status(400).json({
         message: 'Access token is not present for the given Item ID. Please try again',
       });
     }
     // Remove the item from the Plaid API
     await plaidClient.itemRemove({
-      access_token: accessToken,
+      access_token: itemInfo.access_token,
     });
     // Remove the item from the database
     await removeItemId(itemId);
