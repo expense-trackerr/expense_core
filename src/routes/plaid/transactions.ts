@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import express from 'express';
 import { RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid';
 import { plaidClient } from '../../config/plaid-config';
@@ -11,6 +12,75 @@ type TransactionsAllData = {
   modified: Transaction[];
   removed: RemovedTransaction[];
   nextCursor: string | undefined;
+};
+
+// Fetch all transactions data for an item
+const fetchTransactionsData = async (
+  accessToken: string,
+  initialCursor: string | null,
+  retriesLeft = 3
+): Promise<TransactionsAllData> => {
+  const allData: TransactionsAllData = {
+    added: [],
+    modified: [],
+    removed: [],
+    nextCursor: initialCursor ?? undefined,
+  };
+
+  if (retriesLeft <= 0) {
+    console.error('Too many retries!');
+    return allData;
+  }
+  try {
+    let hasMore = true;
+    // Iterate through each page of new transaction updates for item
+    while (hasMore) {
+      const transactionsRequest: TransactionsSyncRequest = {
+        access_token: accessToken,
+        cursor: allData.nextCursor,
+      };
+      const transactions = await plaidClient.transactionsSync(transactionsRequest);
+      const newData = transactions.data;
+
+      allData.added = allData.added.concat(newData.added);
+      allData.modified = allData.modified.concat(newData.modified);
+      allData.removed = allData.removed.concat(newData.removed);
+      allData.nextCursor = newData.next_cursor;
+      hasMore = newData.has_more;
+    }
+
+    return allData;
+  } catch (error) {
+    console.log(`Oh no! Error! ${JSON.stringify(error)} Let's try again from the beginning!`);
+    return fetchTransactionsData(accessToken, initialCursor, retriesLeft - 1);
+  }
+};
+
+// Extracts the necessary fields from a transaction object
+const getSimpleTransactionObject = (transaction: Transaction) => {
+  const {
+    transaction_id,
+    account_id,
+    iso_currency_code,
+    amount,
+    merchant_name,
+    name,
+    authorized_date,
+    date,
+    pending,
+    pending_transaction_id,
+  } = transaction;
+
+  return {
+    transactionId: transaction_id,
+    accountId: account_id,
+    isoCurrencyCode: iso_currency_code,
+    amount,
+    name: merchant_name ?? name,
+    date: authorized_date ?? date,
+    pending,
+    pendingTransactionId: pending_transaction_id,
+  };
 };
 
 // Retrieve Transactions for an Item
@@ -37,32 +107,7 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
       });
     }
 
-    const allData: TransactionsAllData = {
-      added: [],
-      modified: [],
-      removed: [],
-      nextCursor: undefined,
-    };
-
-    let hasMore = true;
-    // Iterate through each page of new transaction updates for item
-    while (hasMore) {
-      const transactionsRequest: TransactionsSyncRequest = {
-        access_token: itemInfo.access_token,
-        cursor: allData.nextCursor,
-      };
-      const transactions = await plaidClient.transactionsSync(transactionsRequest);
-      const newData = transactions.data;
-
-      allData.added = allData.added.concat(newData.added);
-      allData.modified = allData.modified.concat(newData.modified);
-      allData.removed = allData.removed.concat(newData.removed);
-      hasMore = newData.has_more;
-      // Update cursor to the next cursor
-      allData.nextCursor = newData.next_cursor;
-    }
-
-    // const recentlyAdded = [...added].sort(compareTxnsByDateAscending);
+    const allData = await fetchTransactionsData(itemInfo.access_token, itemInfo.last_cursor);
     return response.status(200).json(allData);
   } catch (error) {
     console.error('Error getting transactions:', error);
