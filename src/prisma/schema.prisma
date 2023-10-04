@@ -102,6 +102,7 @@ model Transaction {
   name                   String
   amount                 Decimal        @db.Decimal(10, 2)
   pending                Boolean        @default(false)
+  currency               String         @default("CAD")
   created_at             DateTime       @default(now())
   updated_at             DateTime       @updatedAt
   category               Category?      @relation(fields: [category_id], references: [id], onDelete: Restrict)
