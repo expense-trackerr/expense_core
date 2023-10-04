@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import express from 'express';
-import { CountryCode, Products, RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid';
+import { CountryCode, Products, Transaction } from 'plaid';
 import { plaidClient } from '../config/plaid-config';
 import {
   getAccessTokenAndCursorFromItemId,
@@ -11,15 +11,7 @@ import {
 } from '../controller/linkedAccount';
 import { UserInfoRequest } from '../utils/express-types';
 
-type TransactionsAllData = {
-  added: Transaction[];
-  modified: Transaction[];
-  removed: RemovedTransaction[];
-  nextCursor: string | undefined;
-};
-
 const router = express.Router();
-let ACCESS_TOKEN = 'access-sandbox-565b0d29-b155-4bc7-b5fc-1275e050d721';
 const PLAID_PRODUCTS = (process.env.PLAID_PRODUCTS || Products.Transactions).split(',') as Products[];
 const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || 'US, CA').split(',') as CountryCode[];
 const PLAID_REDIRECT_URI = process.env.PLAID_REDIRECT_URI || '';
@@ -134,63 +126,6 @@ router.post('/set_access_token', async (request: UserInfoRequest, response, next
     response
       .status(500)
       .json({ error: 'Error getting or setting the access token', message: (error as Error).message });
-    next();
-  }
-});
-
-// Retrieve Transactions for an Item
-router.get('/transactions/:item_id', async (request: UserInfoRequest, response, next) => {
-  const { item_id: itemId } = request.params;
-  const userUid = request.userUid;
-  try {
-    // If user ID is not preset, return an error
-    if (!userUid) {
-      return response.status(400).json({
-        message: 'User ID is not present. Ensure that you are logged in to the application',
-      });
-    }
-    // Get the access token
-    const itemInfo = await getAccessTokenAndCursorFromItemId(itemId, userUid);
-    if (!itemInfo) {
-      return response.status(400).json({
-        message: 'No linked account found for the given item ID',
-      });
-    }
-    if (!itemInfo.access_token) {
-      return response.status(400).json({
-        message: 'Access token is not present for the given Item ID. Please try again',
-      });
-    }
-
-    const allData: TransactionsAllData = {
-      added: [],
-      modified: [],
-      removed: [],
-      nextCursor: undefined,
-    };
-
-    let hasMore = true;
-    // Iterate through each page of new transaction updates for item
-    while (hasMore) {
-      const transactionsRequest: TransactionsSyncRequest = {
-        access_token: itemInfo.access_token,
-        cursor: allData.nextCursor,
-      };
-      const transactions = await plaidClient.transactionsSync(transactionsRequest);
-      const newData = transactions.data;
-
-      allData.added = allData.added.concat(newData.added);
-      allData.modified = allData.modified.concat(newData.modified);
-      allData.removed = allData.removed.concat(newData.removed);
-      hasMore = newData.has_more;
-      // Update cursor to the next cursor
-      allData.nextCursor = newData.next_cursor;
-    }
-
-    // const recentlyAdded = [...added].sort(compareTxnsByDateAscending);
-    return response.status(200).json(allData);
-  } catch (error) {
-    console.error('Error getting transactions:', error);
     next();
   }
 });

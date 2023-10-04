@@ -11,6 +11,7 @@ const categories = require('./routes/categories');
 const users = require('./routes/users');
 const todo = require('./routes/todo');
 const plaid = require('./routes/plaid');
+const transactions = require('./routes/plaid/transactions');
 require('dotenv').config();
 
 // Middlewares
@@ -25,6 +26,7 @@ app.use('/api/categories', categories);
 app.use('/users', users);
 app.use('/api/todo', todo);
 app.use('/api', plaid);
+app.use('/api', transactions);
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'dev') {
   app.use(morgan('tiny'));
 }
