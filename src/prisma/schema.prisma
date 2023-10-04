@@ -97,10 +97,11 @@ model Category {
 }
 
 model Transaction {
-  id                     String         @id @default(uuid())
+  id                     String         @id
   date                   DateTime
   name                   String
   amount                 Decimal        @db.Decimal(10, 2)
+  pending                Boolean        @default(false)
   created_at             DateTime       @default(now())
   updated_at             DateTime       @updatedAt
   category               Category?      @relation(fields: [category_id], references: [id], onDelete: Restrict)
