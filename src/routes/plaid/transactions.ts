@@ -4,6 +4,7 @@ import { RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid'
 import { plaidClient } from '../../config/plaid-config';
 import { getAccessTokenAndCursorFromItemId } from '../../controller/linkedAccount';
 import { UserInfoRequest } from '../../utils/express-types';
+import { addNewTransaction, modifyTransaction } from '../../controller/transactions';
 
 const router = express.Router();
 export const DEFAULT_CURRENCY = 'CAD';
@@ -110,12 +111,32 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
         message: 'Access token is not present for the given Item ID. Please try again',
       });
     }
+    const summary = { added: 0, removed: 0, modified: 0, errors: 0 };
 
     const allData = await fetchTransactionsData(itemInfo.access_token, itemInfo.last_cursor);
 
-    const addedTransactions = allData.added.map((transaction) => getSimpleTransactionObject(transaction, userUid));
-    const modifiedTransactions = allData.modified.map((transaction) =>
-      getSimpleTransactionObject(transaction, userUid)
+    // Add new transactions to the database
+    await Promise.all(
+      allData.added.map(async (transaction) => {
+        const added = await addNewTransaction(getSimpleTransactionObject(transaction, userUid), allData.removed);
+        if (added) {
+          summary.added += 1;
+        } else {
+          summary.errors += 1;
+        }
+      })
+    );
+
+    // Modify existing transactions in the database
+    await Promise.all(
+      allData.modified.map(async (transaction) => {
+        const modified = await modifyTransaction(getSimpleTransactionObject(transaction, userUid));
+        if (modified) {
+          summary.modified += 1;
+        } else {
+          summary.errors += 1;
+        }
+      })
     );
 
     return response.status(200).json(allData);

@@ -1,58 +1,118 @@
+import { RemovedTransaction } from 'plaid';
 import { prisma } from '../config/database';
 import { SimpleTransaction } from '../routes/plaid/transactions';
 
-const mapTransactionsForDb = (transactions: SimpleTransaction[]) => {
-  return transactions.map((item) => ({
-    id: item.transactionId,
-    user_id: item.userId,
-    linked_sub_account_id: item.accountId,
-    currency: item.currencyCode,
-    amount: item.amount,
-    name: item.name,
-    date: item.date,
-    pending: item.pending,
-  }));
+// Transforms the transaction data into the database format
+const mapTransactionForDb = (txn: SimpleTransaction) => {
+  return {
+    id: txn.transactionId,
+    user_id: txn.userId,
+    linked_sub_account_id: txn.accountId,
+    currency: txn.currencyCode,
+    amount: txn.amount,
+    name: txn.name,
+    date: txn.date,
+    pending: txn.pending,
+  };
 };
 
-export const addNewTransactions = async (transactionsData: SimpleTransaction[]) => {
-  const mapDataToTransactions = mapTransactionsForDb(transactionsData);
-
+const handlePendingToPostedTransaction = async (
+  transactionData: SimpleTransaction,
+  removedTransactions: RemovedTransaction[]
+) => {
   try {
-    // Add the transactions to the database
-    const dbRes = await prisma.transaction.createMany({
-      data: mapDataToTransactions,
+    if (!transactionData.pendingTransactionId) {
+      throw new Error('Pending transaction ID not found');
+    }
+
+    // Check if the pending transaction is in the removed transactions
+    const pendingTxnInRemoved = removedTransactions.find(
+      (item) => item.transaction_id === transactionData.pendingTransactionId
+    );
+
+    // If the pending transaction is not in the removed transactions, throw an error
+    if (!pendingTxnInRemoved) {
+      const errorMsg = `Pending transaction with transaction ID: ${transactionData.transactionId} not found in removed transactions`;
+      throw new Error(errorMsg);
+    }
+
+    const pendingTransaction = await prisma.transaction.findUnique({
+      where: {
+        id: transactionData.pendingTransactionId,
+      },
     });
 
-    if (dbRes.count === transactionsData.length) {
+    if (!pendingTransaction) {
+      const errorMsg = `Pending transaction with transaction ID: ${transactionData.pendingTransactionId} not found in database`;
+      throw new Error(errorMsg);
+    }
+
+    // Create a new transaction with the pending transaction's data
+    const dbRes = await prisma.transaction.create({
+      data: {
+        id: transactionData.transactionId,
+        user_id: transactionData.userId,
+        linked_sub_account_id: pendingTransaction.linked_sub_account_id,
+        currency: pendingTransaction.currency,
+        amount: pendingTransaction.amount,
+        name: pendingTransaction.name,
+        date: pendingTransaction.date,
+        pending: false,
+      },
+    });
+
+    if (dbRes.id === transactionData.transactionId) {
       return true;
     }
     return false;
   } catch (error) {
-    console.error('Error adding transactions to database:', error);
+    console.error('Error handling pending to posted transaction:', error);
     return false;
   }
 };
 
-export const modifyTransactions = async (transactionsData: SimpleTransaction[]) => {
-  const mapDataToTransactions = mapTransactionsForDb(transactionsData);
-
+export const addNewTransaction = async (
+  transactionData: SimpleTransaction,
+  removedTransactions: RemovedTransaction[]
+) => {
   try {
-    // Update the transactions in the database
-    const dbRes = await prisma.transaction.updateMany({
-      where: {
-        id: {
-          in: mapDataToTransactions.map((item) => item.id),
-        },
-      },
-      data: mapDataToTransactions,
+    // If transction is moved from pending to posted
+    if (!transactionData.pending && transactionData.pendingTransactionId) {
+      return await handlePendingToPostedTransaction(transactionData, removedTransactions);
+    }
+
+    // Add the transaction to the database
+    const dbRes = await prisma.transaction.create({
+      data: mapTransactionForDb(transactionData),
     });
 
-    if (dbRes.count === transactionsData.length) {
+    if (dbRes.id === transactionData.transactionId) {
       return true;
     }
     return false;
   } catch (error) {
-    console.error('Error updating transactions in database:', error);
+    console.error('Error adding transaction to database:', error);
+    return false;
+  }
+};
+
+export const modifyTransaction = async (transactionsData: SimpleTransaction) => {
+  try {
+    // Update the transaction in the database
+    const dbRes = await prisma.transaction.update({
+      where: {
+        id: transactionsData.transactionId,
+        user_id: transactionsData.userId,
+      },
+      data: mapTransactionForDb(transactionsData),
+    });
+
+    if (dbRes.id === transactionsData.transactionId) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error modifying transaction in database:', error);
     return false;
   }
 };
