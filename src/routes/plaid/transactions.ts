@@ -4,7 +4,12 @@ import { RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid'
 import { plaidClient } from '../../config/plaid-config';
 import { getAccessTokenAndCursorFromItemId } from '../../controller/linkedAccount';
 import { UserInfoRequest } from '../../utils/express-types';
-import { addNewTransaction, modifyTransaction, removeTransaction } from '../../controller/transactions';
+import {
+  addNewTransaction,
+  modifyTransaction,
+  removeTransaction,
+  updateLastCursor,
+} from '../../controller/transactions';
 
 const router = express.Router();
 export const DEFAULT_CURRENCY = 'CAD';
@@ -152,6 +157,9 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
         }
       })
     );
+
+    // Update the last cursor for the item
+    await updateLastCursor(itemId, userUid, allData.nextCursor);
 
     return response.status(200).json(allData);
   } catch (error) {

@@ -141,3 +141,25 @@ export const removeTransaction = async (transactionId: string) => {
     return false;
   }
 };
+
+export const updateLastCursor = async (itemId: string, userId: string, lastCursor: string | undefined) => {
+  try {
+    const dbRes = await prisma.linkedAccount.update({
+      where: {
+        item_id: itemId,
+        user_id: userId,
+      },
+      data: {
+        last_cursor: lastCursor,
+      },
+    });
+
+    if (dbRes.item_id === itemId) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error updating last cursor in database:', error);
+    return false;
+  }
+};
