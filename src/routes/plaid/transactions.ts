@@ -117,8 +117,8 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
 
     // Add new transactions to the database
     await Promise.all(
-      allData.added.map(async (transaction) => {
-        const added = await addNewTransaction(getSimpleTransactionObject(transaction, userUid), allData.removed);
+      allData.added.map(async (txn) => {
+        const added = await addNewTransaction(getSimpleTransactionObject(txn, userUid), allData.removed);
         if (added) {
           summary.added += 1;
         } else {
@@ -129,8 +129,8 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
 
     // Modify existing transactions in the database
     await Promise.all(
-      allData.modified.map(async (transaction) => {
-        const modified = await modifyTransaction(getSimpleTransactionObject(transaction, userUid));
+      allData.modified.map(async (txn) => {
+        const modified = await modifyTransaction(getSimpleTransactionObject(txn, userUid));
         if (modified) {
           summary.modified += 1;
         } else {
@@ -141,9 +141,9 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
 
     // Remove deleted transactions from the database
     await Promise.all(
-      allData.removed.map(async (transaction) => {
-        if (transaction.transaction_id) {
-          const removed = await removeTransaction(transaction.transaction_id);
+      allData.removed.map(async (txn) => {
+        if (txn.transaction_id) {
+          const removed = await removeTransaction(txn.transaction_id);
           if (removed) {
             summary.removed += 1;
           } else {
