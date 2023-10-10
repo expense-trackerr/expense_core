@@ -98,19 +98,25 @@ export const addNewTransaction = async (
 
 export const modifyTransaction = async (transactionsData: SimpleTransaction) => {
   try {
-    // Update the transaction in the database
-    const dbRes = await prisma.transaction.update({
+    // Delete the transaction from the database.
+    // NOTE: If the user has made changes to the transaction in the past, the changes will be lost.
+    const deleteTransaction = await prisma.transaction.delete({
       where: {
         id: transactionsData.transactionId,
-        user_id: transactionsData.userId,
       },
-      data: mapTransactionForDb(transactionsData),
     });
 
-    if (dbRes.id === transactionsData.transactionId) {
-      return true;
+    // If the transaction was deleted successfully, add the modified transaction to the database
+    if (deleteTransaction) {
+      const dbRes2 = await prisma.transaction.create({
+        data: mapTransactionForDb(transactionsData),
+      });
+
+      if (dbRes2.id === transactionsData.transactionId) {
+        return true;
+      }
+      return false;
     }
-    return false;
   } catch (error) {
     console.error('Error modifying transaction in database:', error);
     return false;
