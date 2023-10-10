@@ -4,7 +4,7 @@ import { RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid'
 import { plaidClient } from '../../config/plaid-config';
 import { getAccessTokenAndCursorFromItemId } from '../../controller/linkedAccount';
 import { UserInfoRequest } from '../../utils/express-types';
-import { addNewTransaction, modifyTransaction } from '../../controller/transactions';
+import { addNewTransaction, modifyTransaction, removeTransaction } from '../../controller/transactions';
 
 const router = express.Router();
 export const DEFAULT_CURRENCY = 'CAD';
@@ -135,6 +135,20 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
           summary.modified += 1;
         } else {
           summary.errors += 1;
+        }
+      })
+    );
+
+    // Remove deleted transactions from the database
+    await Promise.all(
+      allData.removed.map(async (transaction) => {
+        if (transaction.transaction_id) {
+          const removed = await removeTransaction(transaction.transaction_id);
+          if (removed) {
+            summary.removed += 1;
+          } else {
+            summary.errors += 1;
+          }
         }
       })
     );

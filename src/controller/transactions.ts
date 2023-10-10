@@ -122,3 +122,22 @@ export const modifyTransaction = async (transactionsData: SimpleTransaction) => 
     return false;
   }
 };
+
+export const removeTransaction = async (transactionId: string) => {
+  try {
+    // Delete the transaction from the database
+    const dbRes = await prisma.transaction.delete({
+      where: {
+        id: transactionId,
+      },
+    });
+
+    if (dbRes.id === transactionId) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error removing transaction from database:', error);
+    return false;
+  }
+};
