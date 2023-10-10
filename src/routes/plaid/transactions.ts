@@ -87,7 +87,7 @@ const fetchTransactionsData = async (
   }
 };
 
-// Retrieve Transactions for an Item
+// Router to retrieve Transactions for an Item
 router.get('/transactions/:item_id', async (request: UserInfoRequest, response, next) => {
   const { item_id: itemId } = request.params;
   const userUid = request.userUid;
@@ -113,7 +113,7 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
 
     const allData = await fetchTransactionsData(itemInfo.access_token, itemInfo.last_cursor);
 
-    const simpleTransactions = allData.added.map((transaction) => getSimpleTransactionObject(transaction, userUid));
+    const addedTransactions = allData.added.map((transaction) => getSimpleTransactionObject(transaction, userUid));
     const modifiedTransactions = allData.modified.map((transaction) =>
       getSimpleTransactionObject(transaction, userUid)
     );

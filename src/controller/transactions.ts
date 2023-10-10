@@ -1,8 +1,8 @@
 import { prisma } from '../config/database';
 import { SimpleTransaction } from '../routes/plaid/transactions';
 
-export const addNewTransactions = async (transactionData: SimpleTransaction[]) => {
-  const mapDataToTransactions = transactionData.map((item) => ({
+const mapTransactionsForDb = (transactions: SimpleTransaction[]) => {
+  return transactions.map((item) => ({
     id: item.transactionId,
     user_id: item.userId,
     linked_sub_account_id: item.accountId,
@@ -12,6 +12,10 @@ export const addNewTransactions = async (transactionData: SimpleTransaction[]) =
     date: item.date,
     pending: item.pending,
   }));
+};
+
+export const addNewTransactions = async (transactionsData: SimpleTransaction[]) => {
+  const mapDataToTransactions = mapTransactionsForDb(transactionsData);
 
   try {
     // Add the transactions to the database
@@ -19,7 +23,7 @@ export const addNewTransactions = async (transactionData: SimpleTransaction[]) =
       data: mapDataToTransactions,
     });
 
-    if (dbRes.count === transactionData.length) {
+    if (dbRes.count === transactionsData.length) {
       return true;
     }
     return false;
@@ -29,17 +33,8 @@ export const addNewTransactions = async (transactionData: SimpleTransaction[]) =
   }
 };
 
-export const modifyTransactions = async (transactionData: SimpleTransaction[]) => {
-  const mapDataToTransactions = transactionData.map((item) => ({
-    id: item.transactionId,
-    user_id: item.userId,
-    linked_sub_account_id: item.accountId,
-    currency: item.currencyCode,
-    amount: item.amount,
-    name: item.name,
-    date: item.date,
-    pending: item.pending,
-  }));
+export const modifyTransactions = async (transactionsData: SimpleTransaction[]) => {
+  const mapDataToTransactions = mapTransactionsForDb(transactionsData);
 
   try {
     // Update the transactions in the database
@@ -52,7 +47,7 @@ export const modifyTransactions = async (transactionData: SimpleTransaction[]) =
       data: mapDataToTransactions,
     });
 
-    if (dbRes.count === transactionData.length) {
+    if (dbRes.count === transactionsData.length) {
       return true;
     }
     return false;
