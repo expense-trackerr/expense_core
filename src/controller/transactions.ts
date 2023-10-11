@@ -67,7 +67,7 @@ const handlePendingToPostedTransaction = async (
     return false;
   } catch (error) {
     console.error('Error handling pending to posted transaction:', error);
-    return false;
+    throw new Error('Failed to handle pending to posted transaction' + error);
   }
 };
 
@@ -78,7 +78,11 @@ export const addNewTransaction = async (
   try {
     // If transction is moved from pending to posted
     if (!transactionData.pending && transactionData.pendingTransactionId) {
-      return await handlePendingToPostedTransaction(transactionData, removedTransactions);
+      const result = await handlePendingToPostedTransaction(transactionData, removedTransactions);
+      if (!result) {
+        throw new Error('Failed to handle pending to posted transaction');
+      }
+      return;
     }
 
     // Add the transaction to the database
@@ -92,7 +96,7 @@ export const addNewTransaction = async (
     return false;
   } catch (error) {
     console.error('Error adding transaction to database:', error);
-    return false;
+    throw new Error('Failed to add transaction to database' + error);
   }
 };
 
@@ -119,7 +123,7 @@ export const modifyTransaction = async (transactionsData: SimpleTransaction) => 
     }
   } catch (error) {
     console.error('Error modifying transaction in database:', error);
-    return false;
+    throw new Error('Failed to modify transaction in database' + error);
   }
 };
 
@@ -138,7 +142,7 @@ export const removeTransaction = async (transactionId: string) => {
     return false;
   } catch (error) {
     console.error('Error removing transaction from database:', error);
-    return false;
+    throw new Error('Failed to remove transaction from database' + error);
   }
 };
 
@@ -160,6 +164,6 @@ export const updateLastCursor = async (itemId: string, userId: string, lastCurso
     return false;
   } catch (error) {
     console.error('Error updating last cursor in database:', error);
-    return false;
+    throw new Error('Failed to update last cursor in database' + error);
   }
 };

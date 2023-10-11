@@ -78,6 +78,7 @@ export const getAccessTokenAndCursorFromItemId = async (itemId: string, userUid:
     return linkedAccount;
   } catch (error) {
     console.error('Error getting access token:', error);
+    throw new Error('Error getting access token:' + error);
   }
 };
 

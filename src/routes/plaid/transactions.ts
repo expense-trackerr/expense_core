@@ -69,6 +69,8 @@ const fetchTransactionsData = async (
     return allData;
   }
   try {
+    console.log('trying to get data');
+
     let hasMore = true;
     // Iterate through each page of new transaction updates for item
     while (hasMore) {
@@ -88,15 +90,19 @@ const fetchTransactionsData = async (
 
     return allData;
   } catch (error) {
-    console.log(`Oh no! Error! ${JSON.stringify(error)} Let's try again from the beginning!`);
+    console.error(`Oh no! Error! ${JSON.stringify(error)} Let's try again from the beginning!`);
+    if (retriesLeft <= 0) {
+      throw new Error('Too many retries! Unable to fetch the transactions' + error);
+    }
     return fetchTransactionsData(accessToken, initialCursor, retriesLeft - 1);
   }
 };
 
 // Router to retrieve Transactions for an Item
-router.get('/transactions/:item_id', async (request: UserInfoRequest, response, next) => {
+router.post('/transactions/:item_id', async (request: UserInfoRequest, response, next) => {
   const { item_id: itemId } = request.params;
   const userUid = request.userUid;
+
   try {
     // If user ID is not preset, return an error
     if (!userUid) {
@@ -119,6 +125,8 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
     const summary = { added: 0, removed: 0, modified: 0, errors: 0 };
 
     const allData = await fetchTransactionsData(itemInfo.access_token, itemInfo.last_cursor);
+
+    console.log('saving data to database', allData);
 
     // Add new transactions to the database
     await Promise.all(
@@ -158,10 +166,16 @@ router.get('/transactions/:item_id', async (request: UserInfoRequest, response, 
       })
     );
 
+    if (summary.errors > 0) {
+      console.error(
+        `Error processing transactions for item ${itemId}: ${JSON.stringify(summary)}. Requires investigation.`
+      );
+    }
+
     // Update the last cursor for the item
     await updateLastCursor(itemId, userUid, allData.nextCursor);
 
-    return response.status(200).json(allData);
+    return response.status(200);
   } catch (error) {
     console.error('Error getting transactions:', error);
     next();
