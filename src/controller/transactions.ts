@@ -95,7 +95,6 @@ export const addNewTransaction = async (
     }
     return false;
   } catch (error) {
-    console.error('Error adding transaction to database:', error);
     throw new Error('Failed to add transaction to database' + error);
   }
 };
@@ -122,7 +121,6 @@ export const modifyTransaction = async (transactionsData: SimpleTransaction) => 
       return false;
     }
   } catch (error) {
-    console.error('Error modifying transaction in database:', error);
     throw new Error('Failed to modify transaction in database' + error);
   }
 };
@@ -141,7 +139,6 @@ export const removeTransaction = async (transactionId: string) => {
     }
     return false;
   } catch (error) {
-    console.error('Error removing transaction from database:', error);
     throw new Error('Failed to remove transaction from database' + error);
   }
 };
@@ -163,7 +160,6 @@ export const updateLastCursor = async (itemId: string, userId: string, lastCurso
     }
     return false;
   } catch (error) {
-    console.error('Error updating last cursor in database:', error);
     throw new Error('Failed to update last cursor in database' + error);
   }
 };
