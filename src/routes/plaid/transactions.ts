@@ -38,6 +38,8 @@ const getSimpleTransactionObject = (transaction: Transaction, userId: string) =>
     pending_transaction_id,
   } = transaction;
 
+  const formattedDate = new Date(authorized_date ?? date);
+
   return {
     userId,
     transactionId: transaction_id,
@@ -45,7 +47,7 @@ const getSimpleTransactionObject = (transaction: Transaction, userId: string) =>
     currencyCode: iso_currency_code ?? DEFAULT_CURRENCY,
     amount,
     name: merchant_name ?? name,
-    date: authorized_date ?? date,
+    date: formattedDate,
     pending,
     pendingTransactionId: pending_transaction_id,
   };
@@ -66,11 +68,9 @@ const fetchTransactionsData = async (
 
   if (retriesLeft <= 0) {
     console.error('Too many retries!');
-    return allData;
+    throw new Error('Too many retries! Unable to fetch the transactions');
   }
   try {
-    console.log('trying to get data');
-
     let hasMore = true;
     // Iterate through each page of new transaction updates for item
     while (hasMore) {
@@ -78,6 +78,7 @@ const fetchTransactionsData = async (
         access_token: accessToken,
         cursor: allData.nextCursor,
       };
+
       const transactions = await plaidClient.transactionsSync(transactionsRequest);
       const newData = transactions.data;
 
@@ -91,9 +92,6 @@ const fetchTransactionsData = async (
     return allData;
   } catch (error) {
     console.error(`Oh no! Error! ${JSON.stringify(error)} Let's try again from the beginning!`);
-    if (retriesLeft <= 0) {
-      throw new Error('Too many retries! Unable to fetch the transactions' + error);
-    }
     return fetchTransactionsData(accessToken, initialCursor, retriesLeft - 1);
   }
 };
@@ -125,8 +123,6 @@ router.post('/transactions/:item_id', async (request: UserInfoRequest, response,
     const summary = { added: 0, removed: 0, modified: 0, errors: 0 };
 
     const allData = await fetchTransactionsData(itemInfo.access_token, itemInfo.last_cursor);
-
-    console.log('saving data to database', allData);
 
     // Add new transactions to the database
     await Promise.all(
