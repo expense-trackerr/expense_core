@@ -162,16 +162,13 @@ router.post('/transactions/:item_id', async (request: UserInfoRequest, response,
       })
     );
 
-    if (summary.errors > 0) {
-      console.error(
-        `Error processing transactions for item ${itemId}: ${JSON.stringify(summary)}. Requires investigation.`
-      );
-    }
-
     // Update the last cursor for the item
     await updateLastCursor(itemId, userUid, allData.nextCursor);
 
-    return response.status(200);
+    response.status(200).json({
+      message: summary.errors ? 'Some transactions could not be updated' : 'Transactions updated successfully',
+      summary,
+    });
   } catch (error) {
     console.error('Error getting transactions:', error);
     response.status(500).json({ error: 'Error getting transactions', message: (error as Error).message });
