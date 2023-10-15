@@ -2,6 +2,8 @@ import { RemovedTransaction } from 'plaid';
 import { prisma } from '../config/database';
 import { SimpleTransaction } from '../routes/plaid/transactions';
 
+// import path from 'path';
+// import fs from 'fs';
 // const appendToFile = (filename: string, data: any) => {
 //   const filePath = path.join(__dirname, filename);
 //   const currentData = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
