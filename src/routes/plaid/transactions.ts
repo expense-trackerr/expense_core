@@ -174,6 +174,7 @@ router.post('/transactions/:item_id', async (request: UserInfoRequest, response,
     return response.status(200);
   } catch (error) {
     console.error('Error getting transactions:', error);
+    response.status(500).json({ error: 'Error getting transactions', message: (error as Error).message });
     next();
   }
 });

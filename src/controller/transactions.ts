@@ -2,6 +2,13 @@ import { RemovedTransaction } from 'plaid';
 import { prisma } from '../config/database';
 import { SimpleTransaction } from '../routes/plaid/transactions';
 
+// const appendToFile = (filename: string, data: any) => {
+//   const filePath = path.join(__dirname, filename);
+//   const currentData = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
+//   currentData.push(data);
+//   fs.writeFileSync(filePath, JSON.stringify(currentData, null, 2));
+// };
+
 // Transforms the transaction data into the database format
 const mapTransactionForDb = (txn: SimpleTransaction) => {
   return {
@@ -95,7 +102,7 @@ export const addNewTransaction = async (
     }
     return false;
   } catch (error) {
-    throw new Error('Failed to add transaction to database' + error);
+    console.error('Failed to add transaction to database', error, JSON.stringify(transactionData));
   }
 };
 
@@ -121,7 +128,7 @@ export const modifyTransaction = async (transactionsData: SimpleTransaction) => 
       return false;
     }
   } catch (error) {
-    throw new Error('Failed to modify transaction in database' + error);
+    console.error('Failed to modify transaction in database', error, JSON.stringify(transactionsData));
   }
 };
 
@@ -139,7 +146,7 @@ export const removeTransaction = async (transactionId: string) => {
     }
     return false;
   } catch (error) {
-    throw new Error('Failed to remove transaction from database' + error);
+    console.error('Failed to remove transaction from database', error, transactionId);
   }
 };
 
@@ -160,6 +167,6 @@ export const updateLastCursor = async (itemId: string, userId: string, lastCurso
     }
     return false;
   } catch (error) {
-    throw new Error('Failed to update last cursor in database' + error);
+    console.error('Failed to update last cursor in database', error, lastCursor);
   }
 };
