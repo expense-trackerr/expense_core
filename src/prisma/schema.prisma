@@ -97,20 +97,20 @@ model Category {
 }
 
 model Transaction {
-  id                    String            @id
+  id                    String           @id
   date                  DateTime
   name                  String
-  amount                Decimal           @db.Decimal(10, 2)
-  pending               Boolean           @default(false)
-  currency              String            @default("CAD")
-  created_at            DateTime          @default(now())
-  updated_at            DateTime          @updatedAt
-  category              Category?         @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  amount                Decimal          @db.Decimal(10, 2)
+  pending               Boolean          @default(false)
+  currency              String           @default("CAD")
+  created_at            DateTime         @default(now())
+  updated_at            DateTime         @updatedAt
+  category              Category?        @relation(fields: [category_id], references: [id], onDelete: Restrict)
   category_id           String?
-  User                  User              @relation(fields: [user_id], references: [id])
+  User                  User             @relation(fields: [user_id], references: [id])
   user_id               String
-  linked_account        LinkedSubAccount? @relation(fields: [linked_sub_account_id], references: [account_id])
-  linked_sub_account_id String?
+  linked_sub_account    LinkedSubAccount @relation(fields: [linked_sub_account_id], references: [account_id])
+  linked_sub_account_id String
 
   @@map("transaction")
 }
