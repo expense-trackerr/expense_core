@@ -33,9 +33,25 @@ export const schema = gql`
     balance: Decimal
   }
 
+  type CategoryName {
+    name: String!
+  }
+
+  type Transaction {
+    id: String!
+    name: String!
+    amount: Decimal!
+    date: String!
+    pending: Boolean!
+    currency: String!
+    category: CategoryName
+    linked_sub_account: LinkedSubAccount!
+  }
+
   type Query {
     getCategoryColors: [CategoryColor!]!
     getCategories(userId: String!): [Category!]!
     getLinkedAccounts(userId: String!): [LinkedAccount!]!
+    getTransactions(userId: String!): [Transaction!]!
   }
 `;

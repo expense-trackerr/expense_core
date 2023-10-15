@@ -1,5 +1,10 @@
 import { prisma } from '../config/database';
-import { QueryGetCategoriesArgs, Resolvers, QueryGetLinkedAccountsArgs } from './generatedGraphqlTypes';
+import {
+  QueryGetCategoriesArgs,
+  Resolvers,
+  QueryGetLinkedAccountsArgs,
+  QueryGetTransactionsArgs,
+} from './generatedGraphqlTypes';
 
 export const resolvers: Resolvers = {
   Query: {
@@ -79,6 +84,45 @@ export const resolvers: Resolvers = {
       });
 
       return linkedAccountsWithStringDate;
+    },
+
+    // Gets all transactions for a user
+    getTransactions: async (_: any, args: QueryGetTransactionsArgs) => {
+      const userId = args.userId;
+      const transactions = await prisma.transaction.findMany({
+        where: {
+          user_id: userId,
+        },
+        select: {
+          id: true,
+          date: true,
+          name: true,
+          amount: true,
+          pending: true,
+          currency: true,
+          category: {
+            select: {
+              name: true,
+            },
+          },
+          linked_sub_account: {
+            select: {
+              account_id: true,
+              name: true,
+              alias_name: true,
+            },
+          },
+        },
+      });
+
+      const txnsWithStringDate = transactions.map((txn) => {
+        return {
+          ...txn,
+          date: txn.date.toISOString(),
+        };
+      });
+
+      return txnsWithStringDate;
     },
   },
 };

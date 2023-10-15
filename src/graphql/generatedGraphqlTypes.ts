@@ -34,6 +34,11 @@ export type CategoryColor = {
   name: Scalars['String']['output'];
 };
 
+export type CategoryName = {
+  __typename?: 'CategoryName';
+  name: Scalars['String']['output'];
+};
+
 export type LinkedAccount = {
   __typename?: 'LinkedAccount';
   alias_name?: Maybe<Scalars['String']['output']>;
@@ -56,6 +61,7 @@ export type Query = {
   getCategories: Array<Category>;
   getCategoryColors: Array<CategoryColor>;
   getLinkedAccounts: Array<LinkedAccount>;
+  getTransactions: Array<Transaction>;
 };
 
 
@@ -66,6 +72,23 @@ export type QueryGetCategoriesArgs = {
 
 export type QueryGetLinkedAccountsArgs = {
   userId: Scalars['String']['input'];
+};
+
+
+export type QueryGetTransactionsArgs = {
+  userId: Scalars['String']['input'];
+};
+
+export type Transaction = {
+  __typename?: 'Transaction';
+  amount: Scalars['Decimal']['output'];
+  category?: Maybe<CategoryName>;
+  currency: Scalars['String']['output'];
+  date: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  linked_sub_account: LinkedSubAccount;
+  name: Scalars['String']['output'];
+  pending: Scalars['Boolean']['output'];
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -143,11 +166,13 @@ export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Category: ResolverTypeWrapper<Category>;
   CategoryColor: ResolverTypeWrapper<CategoryColor>;
+  CategoryName: ResolverTypeWrapper<CategoryName>;
   Decimal: ResolverTypeWrapper<Scalars['Decimal']['output']>;
   LinkedAccount: ResolverTypeWrapper<LinkedAccount>;
   LinkedSubAccount: ResolverTypeWrapper<LinkedSubAccount>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Transaction: ResolverTypeWrapper<Transaction>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -155,11 +180,13 @@ export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   Category: Category;
   CategoryColor: CategoryColor;
+  CategoryName: CategoryName;
   Decimal: Scalars['Decimal']['output'];
   LinkedAccount: LinkedAccount;
   LinkedSubAccount: LinkedSubAccount;
   Query: {};
   String: Scalars['String']['output'];
+  Transaction: Transaction;
 }>;
 
 export type CategoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = ResolversObject<{
@@ -174,6 +201,11 @@ export type CategoryResolvers<ContextType = any, ParentType extends ResolversPar
 export type CategoryColorResolvers<ContextType = any, ParentType extends ResolversParentTypes['CategoryColor'] = ResolversParentTypes['CategoryColor']> = ResolversObject<{
   hex_code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CategoryNameResolvers<ContextType = any, ParentType extends ResolversParentTypes['CategoryName'] = ResolversParentTypes['CategoryName']> = ResolversObject<{
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -203,14 +235,29 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getCategories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<QueryGetCategoriesArgs, 'userId'>>;
   getCategoryColors?: Resolver<Array<ResolversTypes['CategoryColor']>, ParentType, ContextType>;
   getLinkedAccounts?: Resolver<Array<ResolversTypes['LinkedAccount']>, ParentType, ContextType, RequireFields<QueryGetLinkedAccountsArgs, 'userId'>>;
+  getTransactions?: Resolver<Array<ResolversTypes['Transaction']>, ParentType, ContextType, RequireFields<QueryGetTransactionsArgs, 'userId'>>;
+}>;
+
+export type TransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction']> = ResolversObject<{
+  amount?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
+  category?: Resolver<Maybe<ResolversTypes['CategoryName']>, ParentType, ContextType>;
+  currency?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  date?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  linked_sub_account?: Resolver<ResolversTypes['LinkedSubAccount'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  pending?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
   Category?: CategoryResolvers<ContextType>;
   CategoryColor?: CategoryColorResolvers<ContextType>;
+  CategoryName?: CategoryNameResolvers<ContextType>;
   Decimal?: GraphQLScalarType;
   LinkedAccount?: LinkedAccountResolvers<ContextType>;
   LinkedSubAccount?: LinkedSubAccountResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Transaction?: TransactionResolvers<ContextType>;
 }>;
 
