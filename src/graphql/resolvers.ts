@@ -126,7 +126,7 @@ export const resolvers: Resolvers = {
         },
       });
 
-      const txnsWithStringDate = transactions.map((txn) => {
+      const transformedTxns = transactions.map((txn) => {
         return {
           ...txn,
           date: txn.date.toISOString(),
@@ -140,7 +140,7 @@ export const resolvers: Resolvers = {
         };
       });
 
-      return txnsWithStringDate;
+      return transformedTxns;
     },
   },
 };
