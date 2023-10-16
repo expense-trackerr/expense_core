@@ -33,10 +33,6 @@ export const schema = gql`
     balance: Decimal
   }
 
-  type CategoryName {
-    name: String!
-  }
-
   type Transaction {
     id: String!
     name: String!
@@ -44,7 +40,7 @@ export const schema = gql`
     date: String!
     pending: Boolean!
     currency: String!
-    category: CategoryName
+    category: Category
     linked_sub_account: LinkedSubAccount!
   }
 

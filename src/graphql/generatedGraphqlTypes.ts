@@ -34,11 +34,6 @@ export type CategoryColor = {
   name: Scalars['String']['output'];
 };
 
-export type CategoryName = {
-  __typename?: 'CategoryName';
-  name: Scalars['String']['output'];
-};
-
 export type LinkedAccount = {
   __typename?: 'LinkedAccount';
   alias_name?: Maybe<Scalars['String']['output']>;
@@ -82,7 +77,7 @@ export type QueryGetTransactionsArgs = {
 export type Transaction = {
   __typename?: 'Transaction';
   amount: Scalars['Decimal']['output'];
-  category?: Maybe<CategoryName>;
+  category?: Maybe<Category>;
   currency: Scalars['String']['output'];
   date: Scalars['String']['output'];
   id: Scalars['String']['output'];
@@ -166,7 +161,6 @@ export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Category: ResolverTypeWrapper<Category>;
   CategoryColor: ResolverTypeWrapper<CategoryColor>;
-  CategoryName: ResolverTypeWrapper<CategoryName>;
   Decimal: ResolverTypeWrapper<Scalars['Decimal']['output']>;
   LinkedAccount: ResolverTypeWrapper<LinkedAccount>;
   LinkedSubAccount: ResolverTypeWrapper<LinkedSubAccount>;
@@ -180,7 +174,6 @@ export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   Category: Category;
   CategoryColor: CategoryColor;
-  CategoryName: CategoryName;
   Decimal: Scalars['Decimal']['output'];
   LinkedAccount: LinkedAccount;
   LinkedSubAccount: LinkedSubAccount;
@@ -201,11 +194,6 @@ export type CategoryResolvers<ContextType = any, ParentType extends ResolversPar
 export type CategoryColorResolvers<ContextType = any, ParentType extends ResolversParentTypes['CategoryColor'] = ResolversParentTypes['CategoryColor']> = ResolversObject<{
   hex_code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CategoryNameResolvers<ContextType = any, ParentType extends ResolversParentTypes['CategoryName'] = ResolversParentTypes['CategoryName']> = ResolversObject<{
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -240,7 +228,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type TransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction']> = ResolversObject<{
   amount?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
-  category?: Resolver<Maybe<ResolversTypes['CategoryName']>, ParentType, ContextType>;
+  category?: Resolver<Maybe<ResolversTypes['Category']>, ParentType, ContextType>;
   currency?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   date?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -253,7 +241,6 @@ export type TransactionResolvers<ContextType = any, ParentType extends Resolvers
 export type Resolvers<ContextType = any> = ResolversObject<{
   Category?: CategoryResolvers<ContextType>;
   CategoryColor?: CategoryColorResolvers<ContextType>;
-  CategoryName?: CategoryNameResolvers<ContextType>;
   Decimal?: GraphQLScalarType;
   LinkedAccount?: LinkedAccountResolvers<ContextType>;
   LinkedSubAccount?: LinkedSubAccountResolvers<ContextType>;

@@ -102,7 +102,18 @@ export const resolvers: Resolvers = {
           currency: true,
           category: {
             select: {
+              id: true,
               name: true,
+              category_type: {
+                select: {
+                  name: true,
+                },
+              },
+              category_color: {
+                select: {
+                  hex_code: true,
+                },
+              },
             },
           },
           linked_sub_account: {
@@ -119,6 +130,13 @@ export const resolvers: Resolvers = {
         return {
           ...txn,
           date: txn.date.toISOString(),
+          category: txn.category
+            ? {
+                ...txn.category,
+                category_color: txn?.category?.category_color.hex_code,
+                category_type: txn?.category?.category_type.name,
+              }
+            : null,
         };
       });
 
