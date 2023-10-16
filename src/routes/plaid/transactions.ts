@@ -8,7 +8,7 @@ import {
   addNewTransaction,
   modifyTransaction,
   removeTransaction,
-  updateLastCursor,
+  updateCursorAndSyncTime,
 } from '../../controller/transactions';
 
 const router = express.Router();
@@ -162,8 +162,8 @@ router.post('/transactions/:item_id', async (request: UserInfoRequest, response,
       })
     );
 
-    // Update the last cursor for the item
-    await updateLastCursor(itemId, userUid, allData.nextCursor);
+    // Update the last cursor for the item and the last sync time
+    await updateCursorAndSyncTime(itemId, userUid, allData.nextCursor, new Date());
 
     response.status(200).json({
       message: summary.errors ? 'Some transactions could not be updated' : 'Transactions updated successfully',

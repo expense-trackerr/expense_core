@@ -155,7 +155,12 @@ export const removeTransaction = async (transactionId: string) => {
   }
 };
 
-export const updateLastCursor = async (itemId: string, userId: string, lastCursor: string | undefined) => {
+export const updateCursorAndSyncTime = async (
+  itemId: string,
+  userId: string,
+  lastCursor: string | undefined,
+  syncTime: Date
+) => {
   try {
     const dbRes = await prisma.linkedAccount.update({
       where: {
@@ -164,6 +169,7 @@ export const updateLastCursor = async (itemId: string, userId: string, lastCurso
       },
       data: {
         last_cursor: lastCursor,
+        last_synced: syncTime,
       },
     });
 
@@ -172,7 +178,7 @@ export const updateLastCursor = async (itemId: string, userId: string, lastCurso
     }
     return false;
   } catch (error) {
-    console.error('Failed to update last cursor in database', error, lastCursor);
+    console.error('Failed to update the cursor and sync time in the database', error);
     return false;
   }
 };
