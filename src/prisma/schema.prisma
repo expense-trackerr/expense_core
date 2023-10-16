@@ -36,6 +36,7 @@ model LinkedAccount {
   updated_at          DateTime           @updatedAt
   access_token        String             @unique
   last_cursor         String?
+  last_synced         DateTime?
   users               User               @relation(fields: [user_id], references: [id])
   user_id             String
   linked_sub_accounts LinkedSubAccount[]
