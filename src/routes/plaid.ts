@@ -16,17 +16,6 @@ const PLAID_PRODUCTS = (process.env.PLAID_PRODUCTS || Products.Transactions).spl
 const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || 'US, CA').split(',') as CountryCode[];
 const PLAID_REDIRECT_URI = process.env.PLAID_REDIRECT_URI || '';
 
-const compareTxnsByDateAscending = (a: Transaction, b: Transaction) => {
-  const aDate = new Date(a.date).valueOf();
-  const bDate = new Date(b.date).valueOf();
-  if (aDate > bDate) {
-    return 1;
-  } else if (aDate < bDate) {
-    return -1;
-  }
-  return 0;
-};
-
 router.post('/create_link_token', async (request: UserInfoRequest, response, next) => {
   try {
     const configs = {
