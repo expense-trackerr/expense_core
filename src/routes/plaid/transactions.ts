@@ -4,6 +4,7 @@ import { RemovedTransaction, Transaction, TransactionsSyncRequest } from 'plaid'
 import { plaidClient } from '../../config/plaid-config';
 import { getAccessTokenAndCursorFromItemId } from '../../controller/linkedAccount';
 import { UserInfoRequest } from '../../utils/express-types';
+import { convertDateStringToNumber } from '../../utils/date-utils';
 import {
   addNewTransaction,
   modifyTransaction,
@@ -38,7 +39,7 @@ const getSimpleTransactionObject = (transaction: Transaction, userId: string) =>
     pending_transaction_id,
   } = transaction;
 
-  const formattedDate = new Date(authorized_date ?? date);
+  const formattedDate = convertDateStringToNumber(authorized_date ?? date);
 
   return {
     userId,
