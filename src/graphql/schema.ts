@@ -37,7 +37,7 @@ export const schema = gql`
     id: String!
     name: String!
     amount: Decimal!
-    date: String!
+    date: Int!
     pending: Boolean!
     currency: String!
     category: Category

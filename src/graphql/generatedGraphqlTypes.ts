@@ -79,7 +79,7 @@ export type Transaction = {
   amount: Scalars['Decimal']['output'];
   category?: Maybe<Category>;
   currency: Scalars['String']['output'];
-  date: Scalars['String']['output'];
+  date: Scalars['Int']['output'];
   id: Scalars['String']['output'];
   linked_sub_account: LinkedSubAccount;
   name: Scalars['String']['output'];
@@ -162,6 +162,7 @@ export type ResolversTypes = ResolversObject<{
   Category: ResolverTypeWrapper<Category>;
   CategoryColor: ResolverTypeWrapper<CategoryColor>;
   Decimal: ResolverTypeWrapper<Scalars['Decimal']['output']>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   LinkedAccount: ResolverTypeWrapper<LinkedAccount>;
   LinkedSubAccount: ResolverTypeWrapper<LinkedSubAccount>;
   Query: ResolverTypeWrapper<{}>;
@@ -175,6 +176,7 @@ export type ResolversParentTypes = ResolversObject<{
   Category: Category;
   CategoryColor: CategoryColor;
   Decimal: Scalars['Decimal']['output'];
+  Int: Scalars['Int']['output'];
   LinkedAccount: LinkedAccount;
   LinkedSubAccount: LinkedSubAccount;
   Query: {};
@@ -230,7 +232,7 @@ export type TransactionResolvers<ContextType = any, ParentType extends Resolvers
   amount?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   category?: Resolver<Maybe<ResolversTypes['Category']>, ParentType, ContextType>;
   currency?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  date?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  date?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   linked_sub_account?: Resolver<ResolversTypes['LinkedSubAccount'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

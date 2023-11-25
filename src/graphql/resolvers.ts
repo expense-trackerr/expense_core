@@ -129,7 +129,6 @@ export const resolvers: Resolvers = {
       const transformedTxns = transactions.map((txn) => {
         return {
           ...txn,
-          date: txn.date.toISOString(),
           category: txn.category
             ? {
                 ...txn.category,
