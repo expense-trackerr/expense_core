@@ -100,7 +100,7 @@ model Category {
 
 model Transaction {
   id                    String           @id
-  date                  DateTime         @db.Date()
+  date                  Int
   name                  String
   amount                Decimal          @db.Decimal(10, 2)
   pending               Boolean          @default(false)
