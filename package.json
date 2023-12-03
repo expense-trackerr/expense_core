@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.465.0",
     "@google-cloud/secret-manager": "^4.2.1",
     "@graphql-codegen/add": "^5.0.0",
     "@prisma/client": "^5.1.1",

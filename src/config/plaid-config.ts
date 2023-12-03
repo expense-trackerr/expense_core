@@ -1,16 +1,16 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
+import { getSecrets } from './get-secrets';
 require('dotenv').config();
 
-const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
-const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
-const PLAID_SECRET = process.env.PLAID_SECRET;
+const resolvedPlaidSecrets = getSecrets();
+console.log('resolvedPlaidSecrets:', resolvedPlaidSecrets);
 
 const configuration = new Configuration({
-  basePath: PlaidEnvironments[PLAID_ENV],
+  basePath: PlaidEnvironments[resolvedPlaidSecrets.PLAID_ENV],
   baseOptions: {
     headers: {
-      'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
-      'PLAID-SECRET': PLAID_SECRET,
+      'PLAID-CLIENT-ID': resolvedPlaidSecrets.PLAID_CLIENT_ID,
+      'PLAID-SECRET': resolvedPlaidSecrets.PLAID_SECRET,
       'Plaid-Version': '2020-09-14',
     },
   },

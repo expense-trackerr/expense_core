@@ -7,6 +7,7 @@ import { initializeFirebaseApp } from './config/firebase-config';
 import { resolvers } from './graphql/resolvers';
 import { schema } from './graphql/schema';
 import { graphQlMiddleware, restMiddleware } from './middleware/auth-middleware';
+import { initSecrets } from './config/get-secrets';
 const categories = require('./routes/categories');
 const users = require('./routes/users');
 const todo = require('./routes/todo');
@@ -37,6 +38,7 @@ const startServer = async () => {
     resolvers,
     context: graphQlMiddleware,
   });
+  await initSecrets(); // Load secrets from AWS Secrets Manager
   await server.start();
   server.applyMiddleware({ app, path: '/graphql' });
   await initializeFirebaseApp();
