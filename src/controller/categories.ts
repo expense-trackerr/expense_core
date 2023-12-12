@@ -65,6 +65,7 @@ export const createCategory = async (userId: string, categoryPayload: CategoryCr
       throw new Error('Category color ID does not exist');
     }
 
+    // Create the category
     const res = await prisma.category.create({
       data: {
         user_id: userId,

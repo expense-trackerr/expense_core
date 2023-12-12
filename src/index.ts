@@ -12,11 +12,13 @@ const users = require('./routes/users');
 const todo = require('./routes/todo');
 const plaid = require('./routes/plaid');
 const transactions = require('./routes/plaid/transactions');
-require('dotenv').config();
+require('dotenv').config(); // this loads the .env file into process.env
 
-// Middlewares
 const app = express();
 const port = 3000;
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'dev') {
+  app.use(morgan('tiny'));
+}
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
@@ -27,9 +29,6 @@ app.use('/users', users);
 app.use('/api/todo', todo);
 app.use('/api', plaid);
 app.use('/api', transactions);
-if (!process.env.NODE_ENV || process.env.NODE_ENV === 'dev') {
-  app.use(morgan('tiny'));
-}
 
 const startServer = async () => {
   const server = new ApolloServer({
