@@ -7,6 +7,7 @@ import { initializeFirebaseApp } from './config/firebase-config';
 import { resolvers } from './graphql/resolvers';
 import { schema } from './graphql/schema';
 import { graphQlMiddleware, restMiddleware } from './middleware/auth-middleware';
+import { logger } from './config/logger';
 const categories = require('./routes/categories');
 const users = require('./routes/users');
 const todo = require('./routes/todo');
@@ -29,6 +30,9 @@ app.use('/users', users);
 app.use('/api/todo', todo);
 app.use('/api', plaid);
 app.use('/api', transactions);
+
+logger.debug('Debugging info');
+logger.error('Error info');
 
 const startServer = async () => {
   const server = new ApolloServer({
